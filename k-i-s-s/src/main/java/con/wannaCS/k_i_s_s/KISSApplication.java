@@ -1,0 +1,13 @@
+package con.wannaCS.k_i_s_s;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class KISSApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(KISSApplication.class, args);
+	}
+
+}
