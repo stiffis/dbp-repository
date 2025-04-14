@@ -14,10 +14,8 @@ src/main/java/com/example/demo/
 │       └── HuanaException.java
 ├── repository/
 │   └── CalculadoraRepository.java
-├── service/
-│   └── CalculadoraService.java
-└── utils/
-    └── ValidationUtils.java
+└── service/
+    └── CalculadoraService.java
 
 controller: Es la capa encargada de recibir las peticiones HTTP y devolver las respuestas. En este caso, la clase `CalculadoraController` maneja las operaciones de la calculadora.
 domain: Contiene la clase `Calculadora`, que representa el modelo de datos de la calculadora. Esta clase contiene los atributos y métodos necesarios para realizar las operaciones matemáticas.
@@ -45,3 +43,139 @@ utils: Contiene la clase `ValidationUtils`, que proporciona métodos de utilidad
     Recopila requisitos detallados del sistema.
     Configura las herramientas de desarrollo (IDE, sistema de construcción como Maven o Gradle, y bases de datos).
     Comienza con una funcionalidad mínima viable para garantizar un inicio rápido y tangible.
+
+# Pasos en la Implementación
+1. Controller:
+- Propósito: Contiene las clases que manejan las solicitudes HTTP(GET, POST, PUT, DELETE) en los endpoints de la API. Aquí se definen la logica de entrada y salida de datos hacia el cliente.
+- Ejemplo: `<name>Controller.java` (PascalCase)
+(Template)
+```java
+package com.example.demo.controller;
+import com.example.demo.domain.Calculadora;
+import com.example.demo.service.CalculadoraService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+@RestController
+@RequestMapping("/api/calculadora")
+public class CalculadoraController {
+    @Autowired
+    private CalculadoraService calculadoraService;
+    @GetMapping("/suma")
+    public ResponseEntity<Integer> suma(@RequestParam int a, @RequestParam int b) {
+        return ResponseEntity.ok(calculadoraService.suma(a, b));
+    }
+    @GetMapping("/resta")
+    public ResponseEntity<Integer> resta(@RequestParam int a, @RequestParam int b) {
+        return ResponseEntity.ok(calculadoraService.resta(a, b));
+    }
+}
+```
+
+
+2. Service:
+- Propósito: Contiene la lógica de negocio del proyecto. Se separa las reglas del negocio de los controladores y repositorios.
+- Ejemplo: `<name>Service.java` (PascalCase)
+(Template)
+```java
+package com.example.demo.service;
+import com.example.demo.domain.Calculadora;
+import com.example.demo.repository.CalculadoraRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+@Service
+public class CalculadoraService {
+    @Autowired
+    private CalculadoraRepository calculadoraRepository;
+    public int suma(int a, int b) {
+        return a + b;
+    }
+    public int resta(int a, int b) {
+        return a - b;
+    }
+}
+```
+
+3. Repository:
+- Propósito: Contiene las interfaces que interactúan directamente con la vase de datos mediante JPA. 
+- Ejemplo: `<name>Repository.java` (PascalCase)
+(Template)
+```java
+package com.example.demo.repository;
+import com.example.demo.domain.Calculadora;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+@Repository
+public interface CalculadoraRepository extends JpaRepository<Calculadora, Long> {
+    // Aquí puedes definir métodos personalizados si es necesario
+}
+```
+
+4. Domain:
+- Propósito: Contiene las clases que representan las entidades del modelo de dominio, que generalmente se mapean a tablas en la base de datos.
+- Ejemplo: `<name>.java` (PascalCase)
+(Template)
+```java
+package com.example.demo.domain;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+@Entity
+@Table(name = "calculadora")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Calculadora {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private int a;
+    private int b;
+}
+```
+5. Exceptions:
+- Propósito: Contiene las clases que manejan las excepciones personalizadas y globales. También incluye clases de respuesta para informar errores al cliente.
+- Ejemplo: `<name>Exception.java` (PascalCase)
+(Template)(ErrorMessage.java)
+```java
+package com.example.demo.exceptions.global;
+import com.example.demo.exceptions.specific.HuanaException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+@ControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(HuanaException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorMessage> handleHuanaException(HuanaException ex) {
+        ErrorMessage errorMessage = new ErrorMessage(ex.getMessage());
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+}
+```
+(Template)(HuanaException.java)
+```java
+package com.example.demo.exceptions.specific;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class HuanaException extends RuntimeException {
+    public HuanaException(String message) {
+        super(message);
+    }
+}
+```
+
+
