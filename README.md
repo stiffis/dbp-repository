@@ -183,4 +183,21 @@ public class HuanaException extends RuntimeException {
 }
 ```
 
+Controller: creacion de los endpoints y manejo de las peticiones HTTP, este se conecta con el servicio para realizar las operaciones, tambien en controller se manejan las excepciones globales y especificas.
+Service: contiene la logica de negocio(las funciones si es multiplicar dividir ademas aqui se general los errores y estos son mandados al controller para su manejo), se conecta con el repositorio para realizar las operaciones CRUD y se conecta con el controlador para recibir las peticiones HTTP. 
+Exceptions: contiene las excepciones globales y especificas, estas son lanzadas desde el servicio y manejadas en el controlador
+.
+Repository: contiene las interfaces que interactuan directamente con la base de datos, estas son implementadas por el servicio.
+Domain: contiene las clases que representan las entidades del modelo de dominio, que generalmente se mapean a tablas en la base de datos.
+
+Squeme
+```mermaid
+graph TD;
+    A[Controller] -->|Llama a| B[Service]
+    B -->|Llama a| C[Repository]
+    B -->|Lanza excepciones| D[Exceptions]
+    D -->|Maneja excepciones| A
+    C -->|Devuelve datos| B
+    A -->|Devuelve respuesta HTTP| E[Cliente]
+```
 
