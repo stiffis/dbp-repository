@@ -1,0 +1,16 @@
+{
+  "puesto": "Mesero",
+  "funcionesPuesto": "Atender a los clientes del restaurante",
+  "tipoEmpleo": "Tiempo completo",
+  "periodoPago": "Mensual",
+  "montoPorPeriodo": 25000,
+  "modalidadEmpleo": "PRESENCIAL",
+  "lugar": "Av pardo",
+  "habilidades": "TRABAJO_EN_EQUIPO",
+  "numeroPostulaciones": 12,
+  "fechaLimite": "2025-06-30T23:59:59",
+  "imagen": "https://empresa.com/imagenes/oferta123.jpg",
+  "sistemaRemuneracion": "FIJO",
+  "hoursPerDay": "8",
+  "weekDays": "MO"
+}

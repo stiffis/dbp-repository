@@ -1,203 +1,489 @@
-# dbp-repository
+# TrabajoYa - Plataforma de Gestión de Empleos
 
-```
-src/main/java/com/example/demo/
-├── controller/
-│   └── CalculadoraController.java
-├── domain/
-│   └── Calculadora.java
-├── exceptions/
-│   ├── global/
-│   │   ├── ErrorMessage.java
-│   │   └── GlobalExceptionHandler.java
-│   └── specific/
-│       └── HuanaException.java
-├── repository/
-│   └── CalculadoraRepository.java
-└── service/
-    └── CalculadoraService.java
-```
+## Portada
 
-controller: Es la capa encargada de recibir las peticiones HTTP y devolver las respuestas. En este caso, la clase `CalculadoraController` maneja las operaciones de la calculadora.
+- **Título del Proyecto:** TrabajoYa - Plataforma de Gestión de Empleos
+- **Nombre del Curso:** CS 2031 Desarrollo Basado en Plataforma
+- **Nombres de los Integrantes:** [Nombres de los integrantes del equipo]
 
-domain: Contiene la clase `Calculadora`, que representa el modelo de datos de la calculadora. Esta clase contiene los atributos y métodos necesarios para realizar las operaciones matemáticas.
-exceptions: Contiene las clases de excepciones personalizadas. La clase `HuanaException` es una excepción específica que se lanza cuando se produce un error en la calculadora. La clase `GlobalExceptionHandler` maneja las excepciones globales y devuelve un mensaje de error adecuado.
+## Índice
 
-repository: Contiene la interfaz `CalculadoraRepository`, que define los métodos para realizar operaciones matemáticas. Esta interfaz es implementada por la clase `CalculadoraService`.
+1. [Introducción](#introducción)
+2. [Identificación del Problema](#identificación-del-problema)
+3. [Descripción de la Solución](#descripción-de-la-solución)
+4. [Modelo de Entidades](#modelo-de-entidades)
+5. [Testing y Manejo de Errores](#testing-y-manejo-de-errores)
+6. [Medidas de Seguridad Implementadas](#medidas-de-seguridad-implementadas)
+7. [Eventos y Asincronía](#eventos-y-asincronía)
+8. [GitHub](#github)
+9. [Conclusión](#conclusión)
+10. [Apéndices](#apéndices)
 
-service: Contiene la clase `CalculadoraService`, que implementa la lógica de negocio de la calculadora. Esta clase utiliza la interfaz `CalculadoraRepository` para realizar las operaciones matemáticas.
+## Introducción
 
-utils: Contiene la clase `ValidationUtils`, que proporciona métodos de utilidad para validar los datos de entrada. Esta clase se utiliza en el controlador y en el servicio para asegurarse de que los datos sean válidos antes de realizar las operaciones.
+### Contexto
 
-# Plan de Trabajo
+TrabajoYa es un sistema de gestión de ofertas de empleo que busca conectar de manera eficiente a empleadores con personas que están en búsqueda de trabajo. La plataforma surge como respuesta a la necesidad de centralizar y simplificar el proceso de búsqueda y contratación de personal en diversos sectores laborales.
 
-1. Definir el Alcance y los Objetivos del Proyecto
+### Objetivos del Proyecto
 
-    Identificar el tipo de proyecto: ¿Es una aplicación web, un microservicio, una API REST, etc.?
-    Establecer los objetivos principales: Define qué problema resolverá o qué funcionalidades básicas deberá tener el proyecto.
-    Seleccionar la tecnología: Escoge tecnologías como Spring Boot (si es un backend), bases de datos, frameworks front-end, etc.
+- Facilitar la conexión entre oferentes y demandantes de empleo a través de una plataforma digital centralizada
+- Implementar un sistema robusto de gestión de contratos y seguimiento de relaciones laborales
+- Proporcionar un mecanismo de calificaciones bidireccionales para fomentar la confianza entre las partes
+- Automatizar procesos clave como las notificaciones y el seguimiento de postulaciones
 
-2. Organizar la Estructura del Proyecto
+## Identificación del Problema
 
-    Configurar el repositorio: Crea un repositorio en GitHub u otra plataforma de control de versiones.
-    Definir la estructura inicial: Separa carpetas como controller, service, repository, domain, y exceptions (como en el ejemplo anterior).
-    Crear un roadmap: Divide el trabajo en tareas específicas, establece hitos y fija plazos.
+### Descripción del Problema
 
-3. Pasos Adicionales
+El mercado laboral actual se encuentra altamente fragmentado, con múltiples plataformas y medios para la búsqueda y oferta de empleo, lo que dificulta tanto a empleadores como a trabajadores encontrar las oportunidades adecuadas. Esta fragmentación genera:
 
-    Recopila requisitos detallados del sistema.
-    Configura las herramientas de desarrollo (IDE, sistema de construcción como Maven o Gradle, y bases de datos).
-    Comienza con una funcionalidad mínima viable para garantizar un inicio rápido y tangible.
+- Pérdida de tiempo en la búsqueda de candidatos/empleos
+- Dificultad para verificar la legitimidad de las ofertas y postulantes
+- Falta de seguimiento estructurado de las relaciones laborales
+- Comunicación ineficiente entre las partes involucradas
 
-# Pasos en la Implementación
-1. Controller:
-- Propósito: Contiene las clases que manejan las solicitudes HTTP(GET, POST, PUT, DELETE) en los endpoints de la API. Aquí se definen la logica de entrada y salida de datos hacia el cliente.
-- Ejemplo: `<name>Controller.java` (PascalCase)
-(Template)
+### Justificación
+
+La implementación de una plataforma unificada que simplifique el proceso de contratación es esencial para:
+
+- Reducir los tiempos de búsqueda y contratación
+- Aumentar la transparencia en el proceso de contratación
+- Facilitar el seguimiento y la gestión de las relaciones laborales
+- Promover un ambiente de confianza mediante sistemas de calificación
+
+## Descripción de la Solución
+
+### Funcionalidades Implementadas
+
+1. **Gestión de Ofertas de Empleo**
+   - EmpleoA: Ofertas laborales empresariales formales
+   - EmpleoB: Servicios domésticos y trabajos temporales
+2. **Sistema de Postulaciones y Contratos**
+
+   - Proceso de aplicación estructurado
+   - Gestión de contratos digitales
+   - Seguimiento de estado de postulaciones
+
+3. **Sistema de Calificaciones Bidireccionales**
+
+   - Calificaciones para empleadores
+   - Calificaciones para trabajadores
+   - Comentarios y retroalimentación
+
+4. **Notificaciones por Email**
+   - Alertas de nuevas postulaciones
+   - Notificaciones de cambios de estado
+   - Comunicaciones importantes del sistema
+
+### Tecnologías Utilizadas
+
+- **Framework Principal:** Spring Boot 3.4.5
+- **Lenguaje:** Java 21
+- **Base de Datos:** PostgreSQL
+- **Persistencia:** JPA/Hibernate
+- **Plantillas:** Thymeleaf
+- **Testing:**
+  - TestContainers para pruebas de integración
+  - JUnit para pruebas unitarias
+- **Mapeo de Objetos:** ModelMapper
+- **Utilidades:** Lombok
+- **Validación:** Jakarta Validation
+
+## Modelo de Entidades
+
+### Diagrama de Clases Principal
+
+![Modelado](./images/modelo.png)
+
+### Sistema de Calificaciones
+
 ```java
-package com.example.demo.controller;
-import com.example.demo.domain.Calculadora;
-import com.example.demo.service.CalculadoraService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
-@RestController
-@RequestMapping("/api/calculadora")
-public class CalculadoraController {
-    @Autowired
-    private CalculadoraService calculadoraService;
-    @GetMapping("/suma")
-    public ResponseEntity<Integer> suma(@RequestParam int a, @RequestParam int b) {
-        return ResponseEntity.ok(calculadoraService.suma(a, b));
-    }
-    @GetMapping("/resta")
-    public ResponseEntity<Integer> resta(@RequestParam int a, @RequestParam int b) {
-        return ResponseEntity.ok(calculadoraService.resta(a, b));
-    }
-}
-```
-
-
-2. Service:
-- Propósito: Contiene la lógica de negocio del proyecto. Se separa las reglas del negocio de los controladores y repositorios.
-- Ejemplo: `<name>Service.java` (PascalCase)
-(Template)
-```java
-package com.example.demo.service;
-import com.example.demo.domain.Calculadora;
-import com.example.demo.repository.CalculadoraRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.util.List;
-@Service
-public class CalculadoraService {
-    @Autowired
-    private CalculadoraRepository calculadoraRepository;
-    public int suma(int a, int b) {
-        return a + b;
-    }
-    public int resta(int a, int b) {
-        return a - b;
-    }
-}
-```
-
-3. Repository:
-- Propósito: Contiene las interfaces que interactúan directamente con la vase de datos mediante JPA. 
-- Ejemplo: `<name>Repository.java` (PascalCase)
-(Template)
-```java
-package com.example.demo.repository;
-import com.example.demo.domain.Calculadora;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-@Repository
-public interface CalculadoraRepository extends JpaRepository<Calculadora, Long> {
-    // Aquí puedes definir métodos personalizados si es necesario
-}
-```
-
-4. Domain:
-- Propósito: Contiene las clases que representan las entidades del modelo de dominio, que generalmente se mapean a tablas en la base de datos.
-- Ejemplo: `<name>.java` (PascalCase)
-(Template)
-```java
-package com.example.demo.domain;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-@Entity
-@Table(name = "calculadora")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Calculadora {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+// Calificación para Personas
+public class CalificacionPersona {
     private Long id;
-    private int a;
-    private int b;
+    private Persona personaCalificada;
+    private Contrato contrato;
+    private Double puntuacion;
+    private String comentario;
+    private LocalDateTime fecha;
+}
+
+// Calificación para Empresas
+public class CalificacionEmpresa {
+    private Long id;
+    private Empleador empleadorCalificado;
+    private Contrato contrato;
+    private Double puntuacion;
+    private String comentario;
+    private LocalDateTime fecha;
 }
 ```
-5. Exceptions:
-- Propósito: Contiene las clases que manejan las excepciones personalizadas y globales. También incluye clases de respuesta para informar errores al cliente.
-- Ejemplo: `<name>Exception.java` (PascalCase)
-(Template)(ErrorMessage.java)
+
+### Enumeraciones del Sistema
+
 ```java
-package com.example.demo.exceptions.global;
-import com.example.demo.exceptions.specific.HuanaException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-@ControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(HuanaException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorMessage> handleHuanaException(HuanaException ex) {
-        ErrorMessage errorMessage = new ErrorMessage(ex.getMessage());
-        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+public enum modalidad {
+    VIRTUAL,
+    PRESENCIAL,
+    HIBRIDO
+}
+
+public enum SistemaRemuneracion {
+    FIJO,
+    COMISION,
+    MIXTO
+}
+
+public enum WeekDays {
+    LUNES,
+    MARTES,
+    MIERCOLES,
+    JUEVES,
+    VIERNES,
+    SABADO,
+    DOMINGO
+}
+```
+
+## Testing y Manejo de Errores
+
+### Estrategia de Testing
+
+#### 1. Tests Unitarios
+
+```java
+@ExtendWith(MockitoExtension.class)
+public class EmpleoAServiceTest {
+    @Mock
+    private EmpleoARepository empleoARepository;
+    @Mock
+    private EmpleadorRepository empleadorRepository;
+
+    @Test
+    public void testCreateEmpleoA() {
+        // Configuración del test
+        when(empleoARepository.save(any(EmpleoA.class))).thenReturn(testEmpleoA);
+        when(empleadorRepository.findById(anyString())).thenReturn(Optional.of(testempleador));
+
+        // Ejecución
+        EmpleoAResponseDTO result = empleoAService.crearYAsignarEmpleoA(testempleoARequestDTO,"1234");
+
+        // Verificaciones
+        assertNotNull(result);
+        assertEquals("Av.Juarez", result.getLugar());
+        assertEquals("Mensual", result.getPeriodoPago());
     }
 }
 ```
-(Template)(HuanaException.java)
+
+#### 2. Tests de Integración
+
 ```java
-package com.example.demo.exceptions.specific;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class HuanaException extends RuntimeException {
-    public HuanaException(String message) {
-        super(message);
+@DataJpaTest
+@Testcontainers
+@Import(PostgresTestContainerConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+public class EmpleoARepositoryIntegrationTest {
+    @Test
+    public void testGuardarYBuscarEmpleoA() {
+        // Creación de entidad de prueba
+        EmpleoA empleo = new EmpleoA();
+        // Configuración de la entidad
+
+        // Prueba de persistencia
+        EmpleoA saved = empleoARepository.save(empleo);
+        assertThat(saved).isNotNull();
+
+        // Verificación de recuperación
+        EmpleoA found = empleoARepository.findById(saved.getIdOfertaEmpleo()).orElse(null);
+        assertThat(found).isNotNull();
     }
 }
 ```
 
-Controller: creacion de los endpoints y manejo de las peticiones HTTP, este se conecta con el servicio para realizar las operaciones, tambien en controller se manejan las excepciones globales y especificas.
-Service: contiene la logica de negocio(las funciones si es multiplicar dividir ademas aqui se general los errores y estos son mandados al controller para su manejo), se conecta con el repositorio para realizar las operaciones CRUD y se conecta con el controlador para recibir las peticiones HTTP. 
-Exceptions: contiene las excepciones globales y especificas, estas son lanzadas desde el servicio y manejadas en el controlador
-.
-Repository: contiene las interfaces que interactuan directamente con la base de datos, estas son implementadas por el servicio.
-Domain: contiene las clases que representan las entidades del modelo de dominio, que generalmente se mapean a tablas en la base de datos.
+## Medidas de Seguridad Implementadas
 
-Squeme
-```mermaid
-graph TD;
-    A[Controller] -->|Llama a| B[Service]
-    B -->|Llama a| C[Repository]
-    B -->|Lanza excepciones| D[Exceptions]
-    D -->|Maneja excepciones| A
-    C -->|Devuelve datos| B
-    A -->|Devuelve respuesta HTTP| E[Cliente]
+### Validación de Datos
+
+- Implementación de validaciones robustas utilizando Jakarta Validation
+- Verificación de formatos y restricciones en datos de entrada
+- Validación de reglas de negocio específicas
+
+### Manejo de Excepciones
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(PersonaNotFound.class)
+    public ResponseEntity<ErrorMessage> handlePersonaNotFoundException(PersonaNotFound ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                           .body(new ErrorMessage(ex.getMessage()));
+    }
+
+    @ExceptionHandler(EmpleadorWithTheSameRUC.class)
+    public ResponseEntity<ErrorMessage> handleEmpleadorWithTheSameRucException(EmpleadorWithTheSameRUC ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                           .body(new ErrorMessage(ex.getMessage()));
+    }
+}
 ```
 
+## Eventos y Asincronía
+
+### Sistema de Notificaciones por Email
+
+```java
+@Component
+public class EmailListener {
+    @Async
+    @EventListener
+    public void handleEmailEvent(EmailEvent event) {
+        // Procesamiento asíncrono de emails
+    }
+}
+```
+
+### Procesamiento Asíncrono
+
+- Manejo asíncrono de calificaciones y retroalimentación
+- Procesamiento en segundo plano de tareas no críticas
+- Optimización de rendimiento mediante operaciones no bloqueantes
+
+## GitHub
+
+### Estructura del Repositorio
+
+```
+├── awsguide.md
+├── LICENSE
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── README.md
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── purrComplexity
+│   │   │           └── TrabajoYa
+│   │   │               ├── AplicaA
+│   │   │               │   ├── AplicaA.java
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── CreateAplicaADTO.java
+│   │   │               │   │   ├── ResponseAplicaADTO.java
+│   │   │               │   │   └── UpdateAplicaADTO.java
+│   │   │               │   ├── Repository
+│   │   │               │   │   └── AplicaARepository.java
+│   │   │               │   └── Service
+│   │   │               │       └── AplicaAService.java
+│   │   │               ├── AplicaB
+│   │   │               │   ├── AplicaB.java
+│   │   │               │   └── dto
+│   │   │               │       ├── CreateAplicaBDTO.java
+│   │   │               │       ├── DeleteAplicaBDTO.java
+│   │   │               │       ├── ResponseAplicaBDTO.java
+│   │   │               │       └── UpdateAplicaBDTO.java
+│   │   │               ├── CalificacionEmpresa
+│   │   │               │   ├── CalificacionEmpresa.java
+│   │   │               │   ├── CalificacionEmpresaRepository.java
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── CalificacionEmpresaRequestDTO.java
+│   │   │               │   │   └── CalificacionEmpresaResponseDTO.java
+│   │   │               │   └── Service
+│   │   │               │       └── CalificacionEmpresaService.java
+│   │   │               ├── CalificacionPersona
+│   │   │               │   ├── CalificacionPersona.java
+│   │   │               │   ├── CalificacionPersonaRepository.java
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── CalificacionPersonaRequestDTO.java
+│   │   │               │   │   └── CalificacionPersonaResponseDTO.java
+│   │   │               │   ├── Exceptions
+│   │   │               │   │   └── TrabajadorNotInContrato.java
+│   │   │               │   └── Service
+│   │   │               │       └── CalificacionPersonaService.java
+│   │   │               ├── Config
+│   │   │               │   └── ModelMapperConfig.java
+│   │   │               ├── Contrato
+│   │   │               │   ├── Contrato.java
+│   │   │               │   ├── ContratoRepository.java
+│   │   │               │   ├── ContratoServiceImpl.java
+│   │   │               │   ├── ContratoService.java
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── ContratoDTO.java
+│   │   │               │   │   ├── CreateContratoDTO.java
+│   │   │               │   │   └── UpdateContratoDTO.java
+│   │   │               │   └── mapper
+│   │   │               │       └── ContratoMapper.java
+│   │   │               ├── Controller
+│   │   │               │   └── AplicationController.java
+│   │   │               ├── email
+│   │   │               │   ├── EmailEvent.java
+│   │   │               │   ├── EmailListener.java
+│   │   │               │   └── EmailService.java
+│   │   │               ├── Empleador
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── EmpleadorRequestDTO.java
+│   │   │               │   │   └── EmpleadorResponseDTO.java
+│   │   │               │   ├── Empleador.java
+│   │   │               │   ├── Exceptions
+│   │   │               │   │   ├── EmpleadorNotFound.java
+│   │   │               │   │   ├── EmpleadorWithTheSameCorreo.java
+│   │   │               │   │   └── EmpleadorWithTheSameRUC.java
+│   │   │               │   ├── Repository
+│   │   │               │   │   └── EmpleadorRepository.java
+│   │   │               │   └── Service
+│   │   │               │       └── EmpleadorService.java
+│   │   │               ├── EmpleoA
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── EmpleoARequestDTO.java
+│   │   │               │   │   └── EmpleoAResponseDTO.java
+│   │   │               │   ├── EmpleoA.java
+│   │   │               │   ├── Repository
+│   │   │               │   │   └── EmpleoARepository.java
+│   │   │               │   └── Service
+│   │   │               │       └── EmpleoAService.java
+│   │   │               ├── EmpleoB
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── EmpleoBRequestDTO.java
+│   │   │               │   │   └── EmpleoBResponseDTO.java
+│   │   │               │   ├── EmpleoB.java
+│   │   │               │   ├── Repository
+│   │   │               │   │   └── EmpleoBRepository.java
+│   │   │               │   └── Service
+│   │   │               │       └── EmpleoBService.java
+│   │   │               ├── Enum
+│   │   │               │   ├── Habilidad.java
+│   │   │               │   ├── modalidad.java
+│   │   │               │   ├── SistemaRemuneracion.java
+│   │   │               │   └── WeekDays.java
+│   │   │               ├── exception
+│   │   │               │   ├── EmpleoANotFoundException.java
+│   │   │               │   ├── EmpleoBNotFoundException.java
+│   │   │               │   ├── FutureDateNotAllowedException.java
+│   │   │               │   ├── RatingOutOfRangeException.java
+│   │   │               │   └── ResourceNotFoundException.java
+│   │   │               ├── GlobalExceptionHandler.java
+│   │   │               ├── OfertaEmpleo
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── OfertaEmpleoRequestDTO.java
+│   │   │               │   │   └── OfertaEmpleoResponseDTO.java
+│   │   │               │   ├── OfertaEmpleo.java
+│   │   │               │   ├── Repository
+│   │   │               │   │   └── OfertaEmpleoRepository.java
+│   │   │               │   └── Service
+│   │   │               │       └── OfertaEmpleoService.java
+│   │   │               ├── Persona
+│   │   │               │   ├── dto
+│   │   │               │   │   ├── CreatePersonaDTO.java
+│   │   │               │   │   ├── PersonaDTO.java
+│   │   │               │   │   ├── PersonaPostulaDTO.java
+│   │   │               │   │   └── UpdatePersonaDTO.java
+│   │   │               │   ├── Exceptions
+│   │   │               │   │   ├── PersonaNotFound.java
+│   │   │               │   │   └── PersonaWithSameCorreo.java
+│   │   │               │   ├── mapper
+│   │   │               │   │   └── PersonaMapper.java
+│   │   │               │   ├── Persona.java
+│   │   │               │   ├── PersonaRepository.java
+│   │   │               │   ├── PersonaServiceImpl.java
+│   │   │               │   └── PersonaService.java
+│   │   │               └── TrabajoYaApplication.java
+│   │   └── resources
+│   │       └── application.properties
+│   └── test
+│       ├── java
+│       │   └── com
+│       │       └── purrComplexity
+│       │           └── TrabajoYa
+│       │               ├── config
+│       │               │   └── PostgresTestContainerConfig.java
+│       │               ├── Contrato
+│       │               │   └── ContratoServiceTest.java
+│       │               ├── Controlador
+│       │               │   └── ControllerTest.java
+│       │               ├── Empleador
+│       │               │   ├── EmpleadorRepositoryIntegrationTest.java
+│       │               │   └── EmpleadorServiceTest.java
+│       │               ├── EmpleoA
+│       │               │   ├── EmpleoARepositoryIntegrationTest.java
+│       │               │   └── EmpleoAServiceTest.java
+│       │               ├── EmpleoB
+│       │               │   └── EmpleoBServiceTest.java
+│       │               ├── Persona
+│       │               │   └── PersonaServiceTest.java
+│       │               ├── TrabajoYaApplicationTests.java
+│       │               └── utils
+│       │                   └── Reader.java
+│       └── resources
+│           ├── application.properties
+│           ├── Empleador
+│           │   └── post.json
+│           ├── EmpleoA
+│           │   └── post.json
+│           ├── EmpleoB
+│           │   └── post.json
+│           └── Persona
+                └── post.json
+```
+
+### Uso de GitHub Projects
+
+- **Organización de Tareas**
+  - Utilización de GitHub Projects para la gestión ágil del proyecto
+  - Creación y asignación de issues para cada funcionalidad
+  - Seguimiento de progreso mediante tableros Kanban
+  - Establecimiento de deadlines para cada tarea
+
+### Flujo de Trabajo
+
+1. **Desarrollo de Features**
+
+   - Creación de branches por funcionalidad
+   - Convención de nombres: `feature/nombre-funcionalidad`
+   - Pull requests con revisión de código
+   - Merge a main después de aprobación
+
+2. **Issues y Milestones**
+
+   - Issues detallados con descripción y criterios de aceptación
+   - Asignación de responsables y etiquetas
+   - Agrupación en milestones para seguimiento de releases
+
+3. **Integración Continua**
+   - Automatización de build y tests
+   - Verificación de calidad de código
+   - Despliegue automático en ambientes de desarrollo
+
+## Conclusión
+
+### Logros del Proyecto
+
+- Implementación exitosa de un sistema completo de gestión de empleos
+- Desarrollo de una arquitectura escalable y mantenible
+- Integración efectiva de múltiples tecnologías modernas
+
+### Aprendizajes Clave
+
+- Aplicación práctica de patrones de diseño en Spring Boot
+- Implementación de pruebas automatizadas
+- Gestión de bases de datos relacionales en aplicaciones empresariales
+
+### Trabajo Futuro
+
+- Implementación de autenticación y autorización
+- Mejoras en el sistema de calificaciones
+- Integración con plataformas de pago
+- Desarrollo de aplicación móvil
+
+## Apéndices
+
+### Licencia
+
+Este proyecto está licenciado bajo la Licencia GPL. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+### Referencias
+
+- [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
+- [Spring Data JPA](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
+- [TestContainers for Java](https://www.testcontainers.org/)

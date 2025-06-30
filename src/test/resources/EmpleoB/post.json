@@ -1,0 +1,14 @@
+{
+  "descripcion": "Limpiar mi casa mientas me voy de viaje",
+  "periodoPago": "Mensual",
+  "montoPorPeriodo": 2000,
+  "modalidadEmpleo": "PRESENCIAL",
+  "lugar": "Av pardo",
+  "habilidades": "LIMPIEZA_MANTENIMIENTO_GENERAL",
+  "numeroPostulaciones": 1,
+  "fechaLimite": "2025-06-30T23:59:59",
+  "imagen": "https://empresa.com/imagenes/oferta123.jpg",
+  "sistemaRemuneracion": "FIJO",
+  "hoursPerDay": "8",
+  "weekDays": "MO"
+}

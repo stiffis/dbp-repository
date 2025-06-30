@@ -1,0 +1,296 @@
+{
+	"info": {
+		"_postman_id": "3671a777-4d35-409e-96db-fd6130ace144",
+		"name": "PROYECTO-DBP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43498940",
+		"_collection_link": "https://dream-team-9392.postman.co/workspace/Woekspace-prueba~ade26bf5-a77c-4012-940b-75ea578584ba/collection/43498940-3671a777-4d35-409e-96db-fd6130ace144?action=share&source=collection_link&creator=43498940"
+	},
+	"item": [
+		{
+			"name": "postEmpleador",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"ruc\": \"1234567891001\",\r\n  \"razonSocial\": \"Tech Solutions S.A.\",\r\n  \"telefonoPrincipal\": 987654321,\r\n  \"correo\": \"contacto@gmail.com\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/empleador",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"empleador"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postPersona",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"ubicacion\": \"Lima, Perú\",\r\n  \"correo\": \"ejemplo@correo.com\",\r\n  \"fechaNacimiento\": \"1995-06-15T00:00:00Z\",\r\n  \"habilidades\": \"LIMPIEZA_MANTENIMIENTO_GENERAL\",\r\n  \"dni\": \"12345678\",\r\n  \"nombresCompletos\": \"Juan Pérez García\"\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/persona",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"persona"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postEmpleoA",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"ruc\": \"1234567891001\",\r\n  \"razonSocial\": \"Tech Solutions S.A.\",\r\n  \"telefonoPrincipal\": 987654321,\r\n  \"correo\": \"contacto@gmail.com\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/empleador",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"empleador"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postCrearContrato",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"personaContratadaId\": 1,\r\n  \"ofertaEmpleoId\": 1,\r\n  \"fechaCreacion\": \"2025-05-27T12:00:00.000+00:00\",\r\n  \"calificaciones\": [5, 4]\r\n}\r\n\r\n"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/contrato/crearnuevo",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"contrato",
+						"crearnuevo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patchOfertaEmpleoA",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"periodoPago\": \"Quincenal\",\r\n  \"montoPorPeriodo\": 1200,\r\n  \"modalidadEmpleo\": \"VIRTUAL\",\r\n  \"lugar\": \"Lima\",\r\n  \"habilidades\": \"LIMPIEZA_MANTENIMIENTO_GENERAL\",\r\n  \"numeroPostulaciones\": 5,\r\n  \"imagen\": \"https://example.com/nueva-imagen.png\",\r\n  \"fechaLimite\": \"2025-11-30T23:59:59\",\r\n  \"sistemaRemuneracion\": \"FIJO\",\r\n  \"hoursPerDay\": \"6\",\r\n  \"weekDays\": \"MO\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/actualizar/OfertaEmpleo/tipoA/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"actualizar",
+						"OfertaEmpleo",
+						"tipoA",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patchOfertaEmpleoB",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"periodoPago\": \"Mensual\",\r\n  \"montoPorPeriodo\": 2000,\r\n  \"modalidadEmpleo\": \"PRESENCIAL\",\r\n  \"lugar\": \"Cusco\",\r\n  \"habilidades\": \"GESTION_TAREAS_COTIDIANAS\",\r\n  \"numeroPostulaciones\": 10,\r\n  \"imagen\": \"https://example.com/nueva-imagen-b.png\",\r\n  \"fechaLimite\": \"2025-12-31T18:00:00\",\r\n  \"sistemaRemuneracion\": \"FIJO\",\r\n  \"hoursPerDay\": \"8\",\r\n  \"weekDays\": \"MO\",\r\n  \"descripcion\": \"Buscamos profesional con experiencia en gestión y coordinación de tareas administrativas.\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/actualizar/OfertaEmpleo/tipoB/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"actualizar",
+						"OfertaEmpleo",
+						"tipoB",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postEmpleoB",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"periodoPago\": \"Mensual\",\r\n  \"montoPorPeriodo\": 1800,\r\n  \"modalidadEmpleo\": \"HIBRIDO\",\r\n  \"lugar\": \"Arequipa\",\r\n  \"habilidades\": \"MANEJO_AGENDAS_CALENDARIOS\",\r\n  \"numeroPostulaciones\": 3,\r\n  \"imagen\": \"https://example.com/imagen-empleo-b.png\",\r\n  \"fechaLimite\": \"2025-12-15T23:59:59\",\r\n  \"sistemaRemuneracion\": \"VARIABLE\",\r\n  \"hoursPerDay\": \"7\",\r\n  \"weekDays\": \"FR\",\r\n  \"descripcion\": \"Se requiere asistente administrativo con experiencia en manejo de agendas y coordinación de reuniones.\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/crear/ofertaEmpleo/tipoB/12345678901",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"crear",
+						"ofertaEmpleo",
+						"tipoB",
+						"12345678901"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postCalificarTrabajador",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"puntuacionTrabajador\": 4,\r\n  \"comentario\": \"Muy buen trabajador, cumplió con todas las tareas asignadas.\",\r\n  \"fechaCalificacion\": \"2025-05-27\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/calificar/Trabajador/1/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"calificar",
+						"Trabajador",
+						"1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postCalificadorEmpresa",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"puntuacionEmpresa\": 5,\r\n  \"comentario\": \"Excelente empresa, muy profesional y cumplida en los pagos.\",\r\n  \"fechaCalificacion\": \"2025-05-27\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/calificar/Empresa/1/12345678901",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"calificar",
+						"Empresa",
+						"1",
+						"12345678901"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
