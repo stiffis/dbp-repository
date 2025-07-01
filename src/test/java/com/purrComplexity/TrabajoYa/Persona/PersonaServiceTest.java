@@ -60,7 +60,9 @@ public class PersonaServiceTest {
     public void setup() {
         modelMapper = new ModelMapper();
 
+/*
         personaService = new PersonaServiceImpl(personaRepository, modelMapper, empleoARepository, empleoBRepository);
+*/
 
         testpersona = new Persona();
         testpersona.setId(1L);

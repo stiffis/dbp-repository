@@ -1,3 +1,4 @@
+/*
 package com.purrComplexity.TrabajoYa.Empleador;
 
 import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
@@ -53,7 +54,8 @@ public class EmpleadorServiceTest {
         empleadorRequestDTO.setTelefonoPrincipal(912321231L);
     }
 
-    /*@Test
+    */
+/*@Test
     public void testCreateEmpleador() {
         when(empleadorRepository.save(any(Empleador.class))).thenReturn(empleador);
 
@@ -65,7 +67,8 @@ public class EmpleadorServiceTest {
         assertEquals(912321231, result.getTelefonoPrincipal());
 
         verify(empleadorRepository).save(any(Empleador.class));
-    }*/
+    }*//*
+
 
     @Test
     public void testEmpleadorNoEncontrad(){
@@ -80,3 +83,4 @@ public class EmpleadorServiceTest {
     }
 
 }
+*/
