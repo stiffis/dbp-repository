@@ -7,7 +7,7 @@ import com.purrComplexity.TrabajoYa.Persona.dto.PersonaDTO;
 import java.util.List;
 
 public interface PersonaService {
-    PersonaDTO createPersona(CreatePersonaDTO persona);
+    PersonaDTO createPersona(Long idUsuario,CreatePersonaDTO persona);
     PersonaDTO getPersonaById(Long id);
     List<Persona> getAllPersonas();
     Persona updatePersona(Long id, Persona persona);

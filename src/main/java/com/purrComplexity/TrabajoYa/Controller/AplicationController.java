@@ -32,6 +32,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,10 +63,16 @@ public class AplicationController {
     private final AplicationService aplicationService;
     private final OfertaEmpleoService ofertaEmpleoService;
 
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/empleador")
     public ResponseEntity<EmpleadorResponseDTO> postEmpleador(@RequestBody EmpleadorRequestDTO dto){
-        EmpleadorResponseDTO resp = empleadorService.crearEmpleador(dto);
-        if(resp == null) return ResponseEntity.badRequest().build();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        EmpleadorResponseDTO resp = empleadorService.crearEmpleador(idUsuario,dto);
+
+        if(resp == null) throw new IllegalArgumentException("El cuerpo no puede estar vacio");
 
         String email = resp.getCorreo();
         eventPublisher.publishEvent(new EmailEvent(email, "EMPLEADOR"));
@@ -75,9 +82,16 @@ public class AplicationController {
     }
 
 
+
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/persona")
-    public ResponseEntity<PersonaDTO> crearPersona(@RequestBody CreatePersonaDTO persona) {
-        PersonaDTO createPersonaDTO = personaServiceImpl.createPersona(persona);
+    public ResponseEntity<PersonaDTO> postPersona(@RequestBody CreatePersonaDTO persona) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        PersonaDTO createPersonaDTO = personaServiceImpl.createPersona(idUsuario, persona);
+
         if (createPersonaDTO == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -88,6 +102,7 @@ public class AplicationController {
         // Publicar evento para enviar correo
         eventPublisher.publishEvent(new EmailEvent(email, "PERSONA"));
         System.out.println("Evento email publicado para persona: " + email);
+
         return new ResponseEntity<>(createPersonaDTO, HttpStatus.CREATED);
     }
 
@@ -189,5 +204,7 @@ public class AplicationController {
         Page<OfertaEmpleoResponseDTO> page = ofertaEmpleoService.obtenerOfertasEmpleoPaginadas(pageable);
         return ResponseEntity.ok(page);
     }
+
+
 
 }

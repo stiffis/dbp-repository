@@ -52,7 +52,6 @@ public class AplicationService {
             throw new IllegalArgumentException("La persona no ha postulado a esta oferta");
         }
 
-
         persona.getAplicaste().add(ofertaEmpleo);
 
         personaRepository.save(persona);
@@ -99,4 +98,6 @@ public class AplicationService {
 
         return "Postulante rechazado con éxito";
     }
+
+
 }

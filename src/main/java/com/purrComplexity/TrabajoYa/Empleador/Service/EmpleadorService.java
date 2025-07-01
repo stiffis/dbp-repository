@@ -7,9 +7,12 @@ import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorRequestDTO;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorResponseDTO;
 import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaWithSameCorreo;
+import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,8 +23,9 @@ import java.util.List;
 public class EmpleadorService {
     private final EmpleadorRepository empleadorRepository;
     private final ModelMapper modelMapper;
+    private final UserAccountRepository userAccountRepository;
 
-    public EmpleadorResponseDTO crearEmpleador(EmpleadorRequestDTO empleadorRequestDTO) {
+    public EmpleadorResponseDTO crearEmpleador(Long id_Usuario,EmpleadorRequestDTO empleadorRequestDTO) {
         if (empleadorRepository.existsByCorreo(empleadorRequestDTO.getCorreo())) {
             throw new EmpleadorWithTheSameCorreo("El correo ya está registrado");
         }
@@ -29,8 +33,20 @@ public class EmpleadorService {
             throw new EmpleadorWithTheSameRUC("El RUC ya está registrado");
         }
 
+        UserAccount userAccount=userAccountRepository.findById(id_Usuario).orElseThrow(()->new UsernameNotFoundException("El usuario no exite"));
+
+        if (userAccount.getIsEmpresario()){
+            throw new RuntimeException("El usuario ya tiene asociado una cuenta de empleador");
+        }
+
+        userAccount.setIsEmpresario(true);
+
         Empleador empleador = modelMapper.map(empleadorRequestDTO, Empleador.class);
         empleador = empleadorRepository.save(empleador);
+
+        userAccount.setEmpresario(empleador);
+
+        userAccountRepository.save(userAccount);
 
         return modelMapper.map(empleador, EmpleadorResponseDTO.class);
     }
