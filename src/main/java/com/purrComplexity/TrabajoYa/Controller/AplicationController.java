@@ -3,6 +3,7 @@ package com.purrComplexity.TrabajoYa.Controller;
 import com.purrComplexity.TrabajoYa.Contrato.ContratoService;
 import com.purrComplexity.TrabajoYa.Contrato.dto.ContratoDTO;
 import com.purrComplexity.TrabajoYa.Contrato.dto.CreateContratoDTO;
+import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.Persona.Persona;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.CalificacionEmpresa;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.Service.CalificacionEmpresaService;
@@ -46,6 +47,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("")
@@ -213,6 +215,7 @@ public class AplicationController {
         return ResponseEntity.ok(page);
     }
 
+
     @PostMapping("/postular/{idOfertaEmpleo}")
     public ResponseEntity<String> postular(@PathVariable Long idOfertaEmpleo) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -222,6 +225,32 @@ public class AplicationController {
         String message = aplicationService.postularEmpleo(idOfertaEmpleo, idUsuario);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/mis/ofertasEmpleos")
+    public ResponseEntity<List<OfertaEmpleo>> getEmpleos(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
+
+        List<OfertaEmpleo> ofertaEmpleos=aplicationService.obtenerEmpleos(idUsuario);
+
+        return new ResponseEntity<>(ofertaEmpleos,HttpStatus.OK);
+    }
+
+    @GetMapping("/mis/postulaciones")
+    public ResponseEntity<List<OfertaEmpleoResponseDTO>> getPostulaciones(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
+
+        List<OfertaEmpleoResponseDTO> ofertaEmpleoResponseDTOS=aplicationService.obtenerPostulaciones(idUsuario);
+
+        return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
+    }
+
+
+
 
 
 }

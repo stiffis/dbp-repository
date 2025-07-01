@@ -14,9 +14,13 @@ import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
 import com.purrComplexity.TrabajoYa.exception.EmpleoNotFound;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +32,7 @@ public class AplicationService {
     private final PersonaRepository personaRepository;
     private final EmpleadorRepository empleadorRepository;
     private final UserAccountRepository userAccountRepository;
+    private final ModelMapper modelMapper;
 
     public AceptadoDTO aceptarPersona(Long idUsuario,Long idEmpleo, Long idPostulante){
         OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(idEmpleo).orElseThrow(()-> new EmpleoNotFound("No se encontro el emeplo"));
@@ -105,9 +110,9 @@ public class AplicationService {
 
     public String postularEmpleo(Long idOferta, Long idUsuario) {
 
-        OfertaEmpleo ofertaEmpleo= ofertaEmpleoRepository.findById(idOferta).
-                orElseThrow( () -> new EmpleoNotFound("No se encontró la oferta de empleo con ID: "));
-        UserAccount userAccount = userAccountRepository.findById(idUsuario).orElseThrow(()-> new RuntimeException("No existe el usuario ingresado"));
+        OfertaEmpleo ofertaEmpleo = ofertaEmpleoRepository.findById(idOferta).
+                orElseThrow(() -> new EmpleoNotFound("No se encontró la oferta de empleo con ID: "));
+        UserAccount userAccount = userAccountRepository.findById(idUsuario).orElseThrow(() -> new RuntimeException("No existe el usuario ingresado"));
         Persona persona = userAccount.getTrabajador();
 
         // verificar si la persona ya postuló a esta oferta
@@ -119,6 +124,41 @@ public class AplicationService {
         // guardar la
         persona.getPostulaste().add(ofertaEmpleo);
 
+        personaRepository.save(persona);
+
         return "Postulación exitosa para la oferta de empleo: " + ofertaEmpleo.getIdOfertaEmpleo();
+    }
+
+    public List<OfertaEmpleo> obtenerEmpleos(Long userID){
+        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No se encontró al usuario"));
+
+        Empleador empleador=userAccount.getEmpresario();
+
+        if (empleador == null) {
+            return Collections.emptyList();
+        }
+
+        return empleador.getOfertas();
+
+    }
+
+    public List<OfertaEmpleoResponseDTO> obtenerPostulaciones(Long userID){
+        UserAccount userAccount= userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No se encontró el usuario"));
+
+        if (!userAccount.getIsTrabajador()){
+            throw new RuntimeException("El usuario no esta registrado como trabajador");
+        }
+
+        Persona persona=userAccount.getTrabajador();
+
+        List<OfertaEmpleoResponseDTO> ofertaEmpleoResponseDTOS = new ArrayList<>();
+
+        for (OfertaEmpleo oferta : persona.getPostulaste()) {
+            OfertaEmpleoResponseDTO dto = modelMapper.map(oferta, OfertaEmpleoResponseDTO.class);
+            ofertaEmpleoResponseDTOS.add(dto);
+        }
+
+        return ofertaEmpleoResponseDTOS;
+
     }
 }

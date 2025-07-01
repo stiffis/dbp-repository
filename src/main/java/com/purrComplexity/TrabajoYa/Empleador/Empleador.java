@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,7 +21,7 @@ public class Empleador {
     private String correo;
 
     @OneToMany(mappedBy = "empleador",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<OfertaEmpleo> ofertas;
+    private List<OfertaEmpleo> ofertas=new ArrayList<>() ;
 
     @OneToOne(mappedBy = "empresario",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserAccount usuario;
