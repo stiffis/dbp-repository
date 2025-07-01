@@ -22,13 +22,19 @@ import com.purrComplexity.TrabajoYa.EmpleoB.Service.EmpleoBService;
 import com.purrComplexity.TrabajoYa.EmpleoB.dto.EmpleoBRequestDTO;
 import com.purrComplexity.TrabajoYa.EmpleoB.dto.EmpleoBResponseDTO;
 import com.purrComplexity.TrabajoYa.Persona.PersonaServiceImpl;
+import com.purrComplexity.TrabajoYa.Persona.dto.AceptadoDTO;
 import com.purrComplexity.TrabajoYa.Persona.dto.CreatePersonaDTO;
 import com.purrComplexity.TrabajoYa.Persona.dto.PersonaDTO;
+import com.purrComplexity.TrabajoYa.Service.AplicationService;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
 import com.purrComplexity.TrabajoYa.email.EmailEvent;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -53,6 +59,7 @@ public class AplicationController {
     private final CalificacionPersonaService calificacionPersonaService;
     private final CalificacionEmpresaService calificacionEmpresaService;
     private final ApplicationEventPublisher eventPublisher;
+    private final AplicationService aplicationService;
     private final OfertaEmpleoService ofertaEmpleoService;
 
     @PostMapping("/empleador")
@@ -89,6 +96,28 @@ public class AplicationController {
         EmpleoAResponseDTO empleoAResponseDTO=empleoAService.crearYAsignarEmpleoA(empleoARequestDTO,rucEmpleador);
 
         return new ResponseEntity<>(empleoAResponseDTO,HttpStatus.CREATED);
+    }
+
+    @PostMapping("/empleador/aceptar/{id_postulante}/{id_empleo}")
+    public ResponseEntity<AceptadoDTO> aceptarEmpleador(@PathVariable Long id_postulante,@PathVariable Long id_empleo){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        AceptadoDTO aceptadoDTO=aplicationService.aceptarPersona(idUsuario,id_empleo,id_postulante);
+
+        return new ResponseEntity<>(aceptadoDTO,HttpStatus.OK);
+    }
+
+    @PostMapping("/empleador/rechazar/{id_postulante}/{id_empleo}")
+    public ResponseEntity<String> rechazarEmpleador(@PathVariable Long id_empleo,@PathVariable Long id_postulante){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        String message=aplicationService.rechazarPersona(idUsuario,id_empleo,id_postulante);
+
+        return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
     @PostMapping("/crear/ofertaEmpleo/tipoB/{rucEmpleador}")
@@ -129,7 +158,7 @@ public class AplicationController {
     @PostMapping("/calificar/Trabajador/{idContrato}/{idPersona}")
     public ResponseEntity<CalificacionPersonaResponseDTO> crearCalificacionPersona(@RequestBody CalificacionPersonaRequestDTO calificacionPersonaRequestDTO
             ,@PathVariable Long idContrato, @PathVariable Long idPersona){
-        CalificacionPersonaResponseDTO calificacionPersonaResponseDTO=calificacionPersonaService.crearCalificacion(idContrato,idPersona,calificacionPersonaRequestDTO);
+        CalificacionPersonaResponseDTO calificacionPersonaResponseDTO = calificacionPersonaService.crearCalificacion(idContrato, idPersona, calificacionPersonaRequestDTO);
 
         return new ResponseEntity<>(calificacionPersonaResponseDTO,HttpStatus.CREATED);
     }

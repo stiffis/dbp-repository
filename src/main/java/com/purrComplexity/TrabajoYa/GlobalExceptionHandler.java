@@ -5,6 +5,7 @@ import com.purrComplexity.TrabajoYa.Empleador.Exceptions.EmpleadorWithTheSameCor
 import com.purrComplexity.TrabajoYa.Empleador.Exceptions.EmpleadorWithTheSameRUC;
 import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaNotFound;
 import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaWithSameCorreo;
+import com.purrComplexity.TrabajoYa.exception.EmpleoNotFound;
 import org.modelmapper.spi.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,12 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(EmpleadorWithTheSameCorreo.class)
     public ResponseEntity<ErrorMessage>handelEmpleadorWithTheSameCorreo(EmpleadorWithTheSameCorreo ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(EmpleoNotFound.class)
+    public ResponseEntity<ErrorMessage>handleEmpleoNotFound(EmpleoNotFound ex){
         ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }

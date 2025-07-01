@@ -70,5 +70,4 @@ public class OfertaEmpleo {
     @ManyToMany(mappedBy = "aplicaste")
     private List<Persona> contratados =new ArrayList<>();
 
-
 };

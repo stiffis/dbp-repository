@@ -1,5 +1,7 @@
 package com.purrComplexity.TrabajoYa.User;
 
+import com.purrComplexity.TrabajoYa.Empleador.Empleador;
+import com.purrComplexity.TrabajoYa.Persona.Persona;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,6 +44,14 @@ public class UserAccount implements UserDetails {
     private Boolean credentialsExpired;
 
     private Boolean enable;
+
+    @OneToOne
+    @JoinColumn(name = "empleador_ruc")
+    private Empleador empresario;
+
+    @OneToOne
+    @JoinColumn(name = "persona_id")
+    private Persona persona;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
