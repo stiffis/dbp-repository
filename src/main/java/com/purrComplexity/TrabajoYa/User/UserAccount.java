@@ -45,17 +45,21 @@ public class UserAccount implements UserDetails {
 
     private Boolean enable;
 
+    private Boolean isEmpresario =false;
+
+    private Boolean isTrabajador=false;
+
     @OneToOne
-    @JoinColumn(name = "empleador_ruc")
+    @JoinColumn(name = "empresario_ruc")
     private Empleador empresario;
 
     @OneToOne
-    @JoinColumn(name = "persona_id")
-    private Persona persona;
+    @JoinColumn(name = "trabajador_id")
+    private Persona trabajador;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

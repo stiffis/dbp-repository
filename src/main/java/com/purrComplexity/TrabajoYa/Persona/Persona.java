@@ -54,7 +54,7 @@ public class Persona {
     )
     private List<OfertaEmpleo> aceptado=new ArrayList<>();
 
-    @OneToOne(mappedBy = "persona",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "trabajador",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserAccount usuario;
 
 }

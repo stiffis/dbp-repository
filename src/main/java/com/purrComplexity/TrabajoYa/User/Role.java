@@ -1,7 +1,7 @@
-package com.purrComplexity.TrabajoYa.User;
+    package com.purrComplexity.TrabajoYa.User;
 
-public enum Role {
-    ADMIN,
-    //EMPLEADOR,
-    USUARIO
-}
+    public enum Role {
+        ADMIN,
+        EMPLEADOR,
+        USUARIO
+    }

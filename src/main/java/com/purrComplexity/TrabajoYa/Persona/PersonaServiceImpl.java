@@ -9,10 +9,13 @@ import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaWithSameCorreo;
 import com.purrComplexity.TrabajoYa.Persona.dto.CreatePersonaDTO;
 import com.purrComplexity.TrabajoYa.Persona.dto.PersonaDTO;
 import com.purrComplexity.TrabajoYa.Persona.dto.PersonaPostulaDTO;
+import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
 import com.purrComplexity.TrabajoYa.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -23,16 +26,29 @@ public class PersonaServiceImpl implements PersonaService {
     private final ModelMapper modelMapper;
     private final EmpleoARepository empleoARepository;
     private final EmpleoBRepository empleoBRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Override
-    public PersonaDTO createPersona(CreatePersonaDTO dto) {
+    public PersonaDTO createPersona(Long idUsuario,CreatePersonaDTO dto) {
         Persona persona = modelMapper.map(dto, Persona.class);
 
         if (personaRepository.existsByCorreo(dto.getCorreo())){
             throw new PersonaWithSameCorreo("El correo ya esta registrado");
         }
 
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
+
+        if (userAccount.getIsTrabajador()){
+            throw new RuntimeException("El usuario ya tiene una cuenta como trabajador");
+        }
+
+        userAccount.setIsTrabajador(true);
+
         persona=personaRepository.save(persona);
+
+        userAccount.setTrabajador(persona);
+
+        userAccountRepository.save(userAccount);
 
         PersonaDTO personaResponseDto=modelMapper.map(persona, PersonaDTO.class);
 

@@ -108,7 +108,7 @@ public class AplicationService {
         OfertaEmpleo ofertaEmpleo= ofertaEmpleoRepository.findById(idOferta).
                 orElseThrow( () -> new EmpleoNotFound("No se encontró la oferta de empleo con ID: "));
         UserAccount userAccount = userAccountRepository.findById(idUsuario).orElseThrow(()-> new RuntimeException("No existe el usuario ingresado"));
-        Persona persona = userAccount.getPersona();
+        Persona persona = userAccount.getTrabajador();
 
         // verificar si la persona ya postuló a esta oferta
         if (persona.getPostulaste().stream().anyMatch(oferta -> oferta.getIdOfertaEmpleo().equals(idOferta))) {
