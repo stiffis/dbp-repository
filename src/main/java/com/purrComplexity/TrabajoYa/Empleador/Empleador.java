@@ -1,6 +1,7 @@
 package com.purrComplexity.TrabajoYa.Empleador;
 
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
@@ -18,6 +19,9 @@ public class Empleador {
     @Email
     private String correo;
 
-    @OneToMany(mappedBy = "empleador",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "empleador",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OfertaEmpleo> ofertas;
+
+    @OneToOne(mappedBy = "empresario",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserAccount usuario;
 }
