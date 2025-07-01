@@ -45,6 +45,8 @@ public class AuthenticationService {
         response.setToken(jwt);
         response.setUsername(user.getUsernameField());
         response.setRole(user.getRole());
+        response.setIsEmpresario(false);
+        response.setIsTrabajador(false);
 
         return response;
     }
@@ -56,9 +58,13 @@ public class AuthenticationService {
 
         JwtAuthenticationResponse response = new JwtAuthenticationResponse();
         response.setToken(jwt);
+
+
         response.setUsername(user.getUsernameField());
+        response.setIsTrabajador(user.getIsTrabajador());
+        response.setIsEmpresario(user.getIsEmpresario());
         response.setRole(user.getRole());
 
         return response;
     }
-}//Copiar y pegar
+}

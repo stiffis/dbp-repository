@@ -6,6 +6,8 @@ public class JwtAuthenticationResponse {
     private String token;
     private String username;
     private Role role;
+    private Boolean isEmpresario;
+    private Boolean isTrabajador;
 
     public JwtAuthenticationResponse() {
     }
@@ -18,6 +20,17 @@ public class JwtAuthenticationResponse {
         this.token = token;
         this.username = username;
         this.role = role;
+    }
+
+    public Boolean getIsEmpresario(){return isEmpresario;}
+    public Boolean getIsTrabajador(){return isTrabajador;}
+
+    public void setIsEmpresario(Boolean r){
+        this.isEmpresario=r;
+    }
+
+    public void setIsTrabajador(Boolean r){
+        this.isTrabajador=r;
     }
 
     public String getToken() {
