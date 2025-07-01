@@ -43,6 +43,13 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(antMatcher("/auth/**")).permitAll()
+                        .requestMatchers(
+                                antMatcher("/swagger-ui/**"),
+                                antMatcher("/v3/api-docs/**"),
+                                antMatcher("/swagger-resources/**"),
+                                antMatcher("/webjars/**"),
+                                antMatcher("/swagger-ui.html")
+                        ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
