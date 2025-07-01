@@ -7,6 +7,8 @@ import com.purrComplexity.TrabajoYa.OfertaEmpleo.dto.OfertaEmpleoResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -86,6 +88,11 @@ public class OfertaEmpleoService {
             ofertaEmpleoResponseDTOS.add(dto);
         }
         return ofertaEmpleoResponseDTOS;
+    }
+
+    public Page<OfertaEmpleoResponseDTO> obtenerOfertasEmpleoPaginadas(Pageable pageable) {
+        Page<OfertaEmpleo> page = ofertaEmpleoRepository.findAll(pageable);
+        return page.map(oferta -> modelMapper.map(oferta, OfertaEmpleoResponseDTO.class));
     }
 
 }

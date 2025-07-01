@@ -32,6 +32,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import com.purrComplexity.TrabajoYa.OfertaEmpleo.Service.OfertaEmpleoService;
+import com.purrComplexity.TrabajoYa.OfertaEmpleo.dto.OfertaEmpleoResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 
 import java.net.URI;
 
@@ -48,6 +53,7 @@ public class AplicationController {
     private final CalificacionPersonaService calificacionPersonaService;
     private final CalificacionEmpresaService calificacionEmpresaService;
     private final ApplicationEventPublisher eventPublisher;
+    private final OfertaEmpleoService ofertaEmpleoService;
 
     @PostMapping("/empleador")
     public ResponseEntity<EmpleadorResponseDTO> postEmpleador(@RequestBody EmpleadorRequestDTO dto){
@@ -148,6 +154,11 @@ public class AplicationController {
         return ResponseEntity.ok(dto);
     }
 
-
+    @GetMapping("/ofertas-empleo")
+    public ResponseEntity<Page<OfertaEmpleoResponseDTO>> getOfertasEmpleoPaginadas(
+            @PageableDefault(size = 10) Pageable pageable) {
+        Page<OfertaEmpleoResponseDTO> page = ofertaEmpleoService.obtenerOfertasEmpleoPaginadas(pageable);
+        return ResponseEntity.ok(page);
+    }
 
 }
