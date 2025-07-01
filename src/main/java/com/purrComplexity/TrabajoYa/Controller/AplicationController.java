@@ -190,4 +190,15 @@ public class AplicationController {
         return ResponseEntity.ok(page);
     }
 
+    @PostMapping("/postular/{idOfertaEmpleo}")
+    public ResponseEntity<String> postular(@PathVariable Long idOfertaEmpleo) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
+
+        String message = aplicationService.postularEmpleo(idOfertaEmpleo, idUsuario);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+
 }

@@ -52,7 +52,7 @@ public class Persona {
             joinColumns = @JoinColumn(name = "persona_id"),
             inverseJoinColumns = @JoinColumn(name = "oferta_id")
     )
-    private List<OfertaEmpleo> aplicaste=new ArrayList<>();
+    private List<OfertaEmpleo> aceptado=new ArrayList<>();
 
     @OneToOne(mappedBy = "persona",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserAccount usuario;
