@@ -6,11 +6,15 @@ import com.purrComplexity.TrabajoYa.EmpleoA.EmpleoA;
 import com.purrComplexity.TrabajoYa.EmpleoA.Repository.EmpleoARepository;
 import com.purrComplexity.TrabajoYa.EmpleoA.dto.EmpleoARequestDTO;
 import com.purrComplexity.TrabajoYa.EmpleoA.dto.EmpleoAResponseDTO;
+import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
 import com.purrComplexity.TrabajoYa.exception.EmpleoANotFoundException;
+import com.purrComplexity.TrabajoYa.exception.NoEmpleadorException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ public class EmpleoAService {
     private final EmpleoARepository empleoARepository;
     private final EmpleadorRepository empleadorRepository;
     private final ModelMapper modelMapper;
+    private final UserAccountRepository userAccountRepository;
 
     public EmpleoAResponseDTO publicarEmpleoA(EmpleoARequestDTO empleoARequestDTO){
         EmpleoA empleoA=modelMapper.map(empleoARequestDTO,EmpleoA.class);
@@ -101,12 +106,20 @@ public class EmpleoAService {
         return empleoAResponseDTOS;
     }
 
-    public EmpleoAResponseDTO crearYAsignarEmpleoA(EmpleoARequestDTO empleoARequestDTO, String id){
+    public EmpleoAResponseDTO crearYAsignarEmpleoA(EmpleoARequestDTO empleoARequestDTO, Long idUsuario){
+
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("El usuario no existe"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new NoEmpleadorException("El usuario no tiene asociado una cuenta empleador");
+        }
+
+        String id=userAccount.getEmpresario().getRuc();
 
         EmpleoA empleoA =modelMapper.map(empleoARequestDTO,EmpleoA.class);
 
         Empleador empleador=
-                empleadorRepository.findById(id).orElseThrow(()->new RuntimeException("No existe un empleador con ese id"));
+                empleadorRepository.findById(id).orElseThrow(()->new RuntimeException("No existe un empresario con ese ruc"));
 
         empleoA.setEmpleador(empleador);
 

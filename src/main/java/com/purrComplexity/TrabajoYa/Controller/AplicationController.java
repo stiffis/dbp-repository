@@ -106,13 +106,19 @@ public class AplicationController {
         return new ResponseEntity<>(createPersonaDTO, HttpStatus.CREATED);
     }
 
-    @PostMapping("/crear/ofertaEmpleo/tipoA/{rucEmpleador}")
-    public ResponseEntity<EmpleoAResponseDTO> crearEmpleoA(@RequestBody EmpleoARequestDTO empleoARequestDTO, @PathVariable String rucEmpleador){
-        EmpleoAResponseDTO empleoAResponseDTO=empleoAService.crearYAsignarEmpleoA(empleoARequestDTO,rucEmpleador);
+    @PreAuthorize("hasRole('USUARIO')")
+    @PostMapping("/crear/ofertaEmpleo/tipoA")
+    public ResponseEntity<EmpleoAResponseDTO> crearEmpleoA(@RequestBody EmpleoARequestDTO empleoARequestDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        EmpleoAResponseDTO empleoAResponseDTO=empleoAService.crearYAsignarEmpleoA(empleoARequestDTO,idUsuario);
 
         return new ResponseEntity<>(empleoAResponseDTO,HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/empleador/aceptar/{id_postulante}/{id_empleo}")
     public ResponseEntity<AceptadoDTO> aceptarEmpleador(@PathVariable Long id_postulante,@PathVariable Long id_empleo){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -124,6 +130,7 @@ public class AplicationController {
         return new ResponseEntity<>(aceptadoDTO,HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/empleador/rechazar/{id_postulante}/{id_empleo}")
     public ResponseEntity<String> rechazarEmpleador(@PathVariable Long id_empleo,@PathVariable Long id_postulante){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -135,6 +142,7 @@ public class AplicationController {
         return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/crear/ofertaEmpleo/tipoB/{rucEmpleador}")
     public ResponseEntity<EmpleoBResponseDTO> crearEmleoB(@RequestBody EmpleoBRequestDTO empleoBRequestDTO, @PathVariable String rucEmpleador){
         EmpleoBResponseDTO empleoBResponseDTO=empleoBService.crearYAsignarEmpleoB(empleoBRequestDTO,rucEmpleador);
