@@ -249,6 +249,14 @@ public class AplicationController {
         return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
     }
 
+    @GetMapping("/mis/postulantes/oferta")
+    public ResponseEntity<List<PersonaDTO>> getPostulantesOferta(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
+
+        List<PersonaDTO> personaDTOS=
+    }
 
 
 
