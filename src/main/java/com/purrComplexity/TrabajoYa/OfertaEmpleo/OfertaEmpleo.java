@@ -32,8 +32,10 @@ public class OfertaEmpleo {
     @Enumerated(EnumType.STRING)
     private modalidad modalidadEmpleo; // VIRTUAL, PRESENCIAL, HIBRIDO
 
+    //private String lugar;
+    private Double longitud;
 
-    private String lugar;
+    private Double latitud;
 
     @Enumerated(EnumType.STRING)
     private Habilidad habilidades;

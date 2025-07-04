@@ -11,7 +11,8 @@ public class PersonaMapper {
     
     public PersonaDTO toDTO(Persona persona) {
         PersonaDTO dto = new PersonaDTO();
-        dto.setUbicacion(persona.getUbicacion());
+        dto.setLatitud(persona.getLatitud());
+        dto.setLongitud(persona.getLongitud());
         dto.setCorreo(persona.getCorreo());
         dto.setFechaNacimiento(persona.getFechaNacimiento());
         dto.setDni(persona.getDni());
@@ -21,7 +22,9 @@ public class PersonaMapper {
     
     public Persona toEntity(CreatePersonaDTO dto) {
         Persona persona = new Persona();
-        persona.setUbicacion(dto.getUbicacion());
+        persona.setLongitud(dto.getLongitud());
+        persona.setLatitud(dto.getLatitud());
+
         persona.setCorreo(dto.getCorreo());
         persona.setFechaNacimiento(dto.getFechaNacimiento());
         persona.setHabilidades(dto.getHabilidades());
@@ -31,9 +34,7 @@ public class PersonaMapper {
     }
     
     public void updateEntityFromDTO(UpdatePersonaDTO dto, Persona persona) {
-        if (dto.getUbicacion() != null) {
-            persona.setUbicacion(dto.getUbicacion());
-        }
+
         if (dto.getCorreo() != null) {
             persona.setCorreo(dto.getCorreo());
         }

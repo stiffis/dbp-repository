@@ -10,9 +10,11 @@ import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaNotFound;
 import com.purrComplexity.TrabajoYa.Persona.Persona;
 import com.purrComplexity.TrabajoYa.Persona.PersonaRepository;
 import com.purrComplexity.TrabajoYa.Persona.dto.AceptadoDTO;
+import com.purrComplexity.TrabajoYa.Persona.dto.PersonaDTO;
 import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
 import com.purrComplexity.TrabajoYa.exception.EmpleoNotFound;
+import com.purrComplexity.TrabajoYa.exception.NoEmpleadorException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.User;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +71,8 @@ public class AplicationService {
 
         aceptadoDTO.setNombreCompletoEmpleado(persona.getNombresCompletos());
         aceptadoDTO.setIdEmpleo(idEmpleo);
-        aceptadoDTO.setLugar(ofertaEmpleo.getLugar());
+        aceptadoDTO.setLatitud(ofertaEmpleo.getLatitud());
+        aceptadoDTO.setLongitud(ofertaEmpleo.getLongitud());
         aceptadoDTO.setCorreoEmpleador(empleador.getCorreo());
 
         return aceptadoDTO;
@@ -161,4 +165,68 @@ public class AplicationService {
         return ofertaEmpleoResponseDTOS;
 
     }
+
+    public List<PersonaDTO> obtenerPostulantes(Long userID, Long ofertaEmpleoID){
+        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new RuntimeException("El usuario no fue encontrado"));
+        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(ofertaEmpleoID).orElseThrow(()->new RuntimeException("No existe la oferta de empleo"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new NoEmpleadorException("El usuario no está registrado como empleador");
+        }
+        //Dudable
+
+        if (userAccount.getEmpresario().getRuc()!=ofertaEmpleo.getEmpleador().getRuc()){
+            throw new RuntimeException("La oferta de empleo no le pertenece al usuario");
+        }
+
+        List<PersonaDTO> personaDTOS=new ArrayList<>();
+
+        List<Persona> personas=ofertaEmpleo.getPostulantes();
+
+        for (Persona postulante:personas){
+            PersonaDTO personaDTO=modelMapper.map(postulante,PersonaDTO.class);
+            personaDTOS.add(personaDTO);
+        }
+
+        return personaDTOS;
+    }
+
+    public double calcularDistancia(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371000; // radio de la Tierra en metros
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // distancia en metros
+    }
+
+    public List<OfertaEmpleoResponseDTO> getOfertasEmpleoCercanos(Long idUsuario, Double radioEnMetros) {
+
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("No se encontró al usuario"));
+
+        if (!userAccount.getIsTrabajador()){
+            throw new RuntimeException("El usuario no esta registrado como trabajador");
+        }
+
+        Persona persona=userAccount.getTrabajador();
+
+        Double lat=persona.getLatitud();
+        Double lng=persona.getLongitud();
+
+        return ofertaEmpleoRepository.findAll().stream()
+                .filter(ofertaEmpleo -> {
+                    double dist = calcularDistancia(lat, lng,
+                            ofertaEmpleo.getLatitud(), // latitude
+                            ofertaEmpleo.getLongitud()); // longitude
+                    return dist <= radioEnMetros;
+                }).map(ofertaEmpleo -> modelMapper.map(ofertaEmpleo, OfertaEmpleoResponseDTO.class))
+                .collect(Collectors.toList());
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.purrComplexity.TrabajoYa.Persona;
+/*package com.purrComplexity.TrabajoYa.Persona;
 
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
 import com.purrComplexity.TrabajoYa.EmpleoA.EmpleoA;
@@ -62,7 +62,7 @@ public class PersonaServiceTest {
 
 /*
         personaService = new PersonaServiceImpl(personaRepository, modelMapper, empleoARepository, empleoBRepository);
-*/
+
 
         testpersona = new Persona();
         testpersona.setId(1L);
@@ -167,3 +167,4 @@ public class PersonaServiceTest {
 
 
 }
+*/

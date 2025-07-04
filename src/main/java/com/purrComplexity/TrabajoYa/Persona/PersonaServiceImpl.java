@@ -76,7 +76,8 @@ public class PersonaServiceImpl implements PersonaService {
 
         persona.setNombresCompletos(personaDetails.getNombresCompletos());
         persona.setCorreo(personaDetails.getCorreo());
-        persona.setUbicacion(personaDetails.getUbicacion());
+        persona.setLatitud(personaDetails.getLatitud());
+        persona.setLongitud(persona.getLongitud());
         persona.setFechaNacimiento(personaDetails.getFechaNacimiento());
         persona.setHabilidades(personaDetails.getHabilidades());
         persona.setDni(personaDetails.getDni());

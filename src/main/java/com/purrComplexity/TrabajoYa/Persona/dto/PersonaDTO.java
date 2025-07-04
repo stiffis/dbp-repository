@@ -5,7 +5,9 @@ import java.util.Date;
 
 @Data
 public class PersonaDTO {
-    private String ubicacion;
+    private Double latitud;
+    private Double longitud;
+
     private String correo;
     private Date fechaNacimiento;
     private String habilidades;

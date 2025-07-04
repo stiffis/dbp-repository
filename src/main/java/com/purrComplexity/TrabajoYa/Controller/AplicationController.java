@@ -4,12 +4,9 @@ import com.purrComplexity.TrabajoYa.Contrato.ContratoService;
 import com.purrComplexity.TrabajoYa.Contrato.dto.ContratoDTO;
 import com.purrComplexity.TrabajoYa.Contrato.dto.CreateContratoDTO;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
-import com.purrComplexity.TrabajoYa.CalificacionEmpresa.CalificacionEmpresa;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.Service.CalificacionEmpresaService;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.dto.CalificacionEmpresaRequestDTO;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.dto.CalificacionEmpresaResponseDTO;
-import com.purrComplexity.TrabajoYa.CalificacionPersona.CalificacionPersonaRepository;
 import com.purrComplexity.TrabajoYa.CalificacionPersona.Service.CalificacionPersonaService;
 import com.purrComplexity.TrabajoYa.CalificacionPersona.dto.CalificacionPersonaRequestDTO;
 import com.purrComplexity.TrabajoYa.CalificacionPersona.dto.CalificacionPersonaResponseDTO;
@@ -36,7 +33,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -82,8 +78,6 @@ public class AplicationController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
-
-
 
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/persona")
@@ -146,7 +140,7 @@ public class AplicationController {
 
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/crear/ofertaEmpleo/tipoB/{rucEmpleador}")
-    public ResponseEntity<EmpleoBResponseDTO> crearEmleoB(@RequestBody EmpleoBRequestDTO empleoBRequestDTO, @PathVariable String rucEmpleador){
+    public ResponseEntity<EmpleoBResponseDTO> crearEmpleoB(@RequestBody EmpleoBRequestDTO empleoBRequestDTO, @PathVariable String rucEmpleador){
         EmpleoBResponseDTO empleoBResponseDTO=empleoBService.crearYAsignarEmpleoB(empleoBRequestDTO,rucEmpleador);
 
         return new ResponseEntity<>(empleoBResponseDTO,HttpStatus.CREATED);
@@ -215,7 +209,7 @@ public class AplicationController {
         return ResponseEntity.ok(page);
     }
 
-
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/postular/{idOfertaEmpleo}")
     public ResponseEntity<String> postular(@PathVariable Long idOfertaEmpleo) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -249,14 +243,18 @@ public class AplicationController {
         return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
     }
 
-    @GetMapping("/mis/postulantes/oferta")
-    public ResponseEntity<List<PersonaDTO>> getPostulantesOferta(){
+    @GetMapping("/mis/postulantes/oferta/{id_ofertaEmpleo}")
+    public ResponseEntity<List<PersonaDTO>> getPostulantesOferta(@PathVariable Long id_ofertaEmpleo){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
         Long idUsuario = detallesUser.getId();
 
-        List<PersonaDTO> personaDTOS=
+        List<PersonaDTO> personaDTOS=aplicationService.obtenerPostulantes(idUsuario,id_ofertaEmpleo);
+
+        return new ResponseEntity<>(personaDTOS,HttpStatus.OK);
     }
+
+
 
 
 
