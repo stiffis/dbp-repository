@@ -254,9 +254,16 @@ public class AplicationController {
         return new ResponseEntity<>(personaDTOS,HttpStatus.OK);
     }
 
+    @GetMapping("/ofertas/cercanas/{radio_metros}")
+    public ResponseEntity<List<OfertaEmpleoResponseDTO>> getOfertasCercanas(@PathVariable Double radio_metros){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
 
+        List<OfertaEmpleoResponseDTO> ofertaEmpleoResponseDTOS=aplicationService.getOfertasEmpleoCercanos(idUsuario,radio_metros);
 
+        return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
 
-
+    }
 
 }
