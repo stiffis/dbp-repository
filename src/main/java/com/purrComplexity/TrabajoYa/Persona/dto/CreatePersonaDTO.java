@@ -11,8 +11,10 @@ import java.util.Date;
 
 @Data
 public class CreatePersonaDTO {
-    @NotBlank(message = "La ubicación es requerida")
-    private String ubicacion;
+
+    private Double longitud;
+    private Double latitud;
+
     
     @NotBlank(message = "El correo es requerido")
     @Email(message = "El formato del correo no es válido")

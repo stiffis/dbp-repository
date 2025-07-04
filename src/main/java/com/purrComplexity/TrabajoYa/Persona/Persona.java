@@ -20,7 +20,9 @@ public class Persona {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ubicacion;
+    //private String ubicacion;
+    private Double longitud;
+    private Double latitud;
 
     @Column(unique = true)
     @Email

@@ -7,6 +7,7 @@ public class AceptadoDTO {
     private String nombreCompletoEmpleado;
     private String correoEmpleador;
     private Long idEmpleo;
-    private String lugar;
+    private Double longitud;
+    private Double latitud;
 
 }
