@@ -41,7 +41,7 @@ public class JwtService {
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis())) //Cuando se creo este token
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))  //Cuanto va a durar
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2))  //Cuanto va a durar
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512).compact(); //Se firma con el HS512
     }
 
