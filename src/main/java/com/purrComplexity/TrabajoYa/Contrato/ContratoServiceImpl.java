@@ -7,9 +7,11 @@ import com.purrComplexity.TrabajoYa.Contrato.mapper.ContratoMapper;
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.Repository.OfertaEmpleoRepository;
-import com.purrComplexity.TrabajoYa.Persona.PersonaRepository;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
+import com.purrComplexity.TrabajoYa.exception.TrabajadorNotFound;
+import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
+import com.purrComplexity.TrabajoYa.Trabajador.TrabajadorRepository;
 import com.purrComplexity.TrabajoYa.email.EmailService;
+import com.purrComplexity.TrabajoYa.exception.ContratoNotFound;
 import com.purrComplexity.TrabajoYa.exception.FutureDateNotAllowedException;
 import com.purrComplexity.TrabajoYa.exception.RatingOutOfRangeException;
 import com.purrComplexity.TrabajoYa.exception.ResourceNotFoundException;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ContratoServiceImpl implements ContratoService {
     private final ContratoRepository contratoRepository;
-    private final PersonaRepository personaRepository;
+    private final TrabajadorRepository trabajadorRepository;
     private final OfertaEmpleoRepository ofertaEmpleoRepository;
     private final ContratoMapper contratoMapper;
     private final EmailService emailService;
@@ -34,7 +36,7 @@ public class ContratoServiceImpl implements ContratoService {
         Long personaId = createContratoDTO.personaContratadaId();
         Long ofertaEmpleoId = createContratoDTO.ofertaEmpleoId();
 
-        Persona personaContratada = personaRepository.findById(personaId)
+        Trabajador trabajador = trabajadorRepository.findById(personaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Persona no encontrada con id: " + personaId));
 
         OfertaEmpleo oferta = ofertaEmpleoRepository.findById(ofertaEmpleoId)
@@ -54,7 +56,7 @@ public class ContratoServiceImpl implements ContratoService {
             });
         }
 
-        Contrato contrato = contratoMapper.toEntity(createContratoDTO, personaContratada, oferta);
+        Contrato contrato = contratoMapper.toEntity(createContratoDTO, trabajador, oferta);
         Contrato savedContrato = contratoRepository.save(contrato);
 
         String mensajeEmpleador = """
@@ -85,7 +87,7 @@ Atentamente,
 Equipo TrabajoYa
 """;
 
-        emailService.sendSimpleMessage(personaContratada.getCorreo(), "Confirmación de nuevo contrato en TrabajoYa", mensajePersona);
+        emailService.sendSimpleMessage(trabajador.getCorreo(), "Confirmación de nuevo contrato en TrabajoYa", mensajePersona);
 
         return contratoMapper.toDTO(savedContrato);
     }
@@ -93,7 +95,7 @@ Equipo TrabajoYa
     @Override
     public ContratoDTO getContratoById(Long id) {
         Contrato contrato = contratoRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Contrato no encontrado con id: " + id));
+            .orElseThrow(ContratoNotFound::new);
         return contratoMapper.toDTO(contrato);
     }
     
@@ -107,15 +109,15 @@ Equipo TrabajoYa
     @Override
     public ContratoDTO updateContrato(Long id, UpdateContratoDTO updateContratoDTO) {
         Contrato contrato = contratoRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Contrato no encontrado con id: " + id));
+            .orElseThrow(ContratoNotFound::new);
             
-        Persona personaContratada = null;
+        Trabajador trabajador = null;
         if (updateContratoDTO.getPersonaContratadaId() != null) {
-            personaContratada = personaRepository.findById(updateContratoDTO.getPersonaContratadaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Persona no encontrada con id: " + updateContratoDTO.getPersonaContratadaId()));
+            trabajador = trabajadorRepository.findById(updateContratoDTO.getPersonaContratadaId())
+                .orElseThrow(TrabajadorNotFound::new);
         }
         
-        contratoMapper.updateEntityFromDTO(updateContratoDTO, contrato, personaContratada);
+        contratoMapper.updateEntityFromDTO(updateContratoDTO, contrato, trabajador);
         Contrato updatedContrato = contratoRepository.save(contrato);
         return contratoMapper.toDTO(updatedContrato);
     }
@@ -123,17 +125,17 @@ Equipo TrabajoYa
     @Override
     public void deleteContrato(Long id) {
         if (!contratoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Contrato no encontrado con id: " + id);
+            throw new ContratoNotFound();
         }
         contratoRepository.deleteById(id);
     }
     
     @Override
-    public List<ContratoDTO> getContratosByPersonaId(Long personaId) {
-        if (!personaRepository.existsById(personaId)) {
-            throw new ResourceNotFoundException("Persona no encontrada con id: " + personaId);
+    public List<ContratoDTO> getContratosByTrabajadorId(Long trabajadorId) {
+        if (!trabajadorRepository.existsById(trabajadorId)) {
+            throw new TrabajadorNotFound();
         }
-        return contratoRepository.findByPersonaContratadaId(personaId).stream()
+        return contratoRepository.findByTrabajadorContratadoId(trabajadorId).stream()
             .map(contratoMapper::toDTO)
             .collect(Collectors.toList());
     }

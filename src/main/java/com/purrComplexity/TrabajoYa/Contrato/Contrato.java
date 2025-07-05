@@ -1,9 +1,9 @@
 package com.purrComplexity.TrabajoYa.Contrato;
 
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.CalificacionEmpresa;
-import com.purrComplexity.TrabajoYa.CalificacionPersona.CalificacionPersona;
+import com.purrComplexity.TrabajoYa.CalificacionTrabajador.CalificacionTrabajador;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
+import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,16 +19,16 @@ public class Contrato {
     private Date fechaCreacion;
     //Relaciones
     @ManyToOne
-    @JoinColumn(name = "personaContratada_id")
-    private Persona personaContratada;
+    @JoinColumn(name = "trabajadorContratado_id")
+    private Trabajador trabajadorContratado;
 
     @ManyToOne
     @JoinColumn(name = "ofertaEmpleo_id")
     private OfertaEmpleo ofertaEmpleo;
 
     @OneToOne
-    @JoinColumn(name="calificacionPersona_id")
-    private CalificacionPersona calificacionPersona;
+    @JoinColumn(name="calificacionTrabajador_id")
+    private CalificacionTrabajador calificacionTrabajador;
 
     @OneToOne
     @JoinColumn(name="calificacionEmpresa_id")

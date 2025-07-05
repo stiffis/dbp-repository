@@ -6,7 +6,7 @@ import com.purrComplexity.TrabajoYa.Enum.WeekDays;
 import com.purrComplexity.TrabajoYa.Enum.Habilidad;
 import com.purrComplexity.TrabajoYa.Enum.SistemaRemuneracion;
 import com.purrComplexity.TrabajoYa.Enum.modalidad;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
+import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +15,6 @@ import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -67,9 +66,9 @@ public class OfertaEmpleo {
     private boolean estadoAplicacion = false;
 
     @ManyToMany(mappedBy = "postulaste")
-    private List<Persona> postulantes =new ArrayList<>();
+    private List<Trabajador> postulantes =new ArrayList<>();
 
-    @ManyToMany(mappedBy = "aceptado")
-    private List<Persona> contratados =new ArrayList<>();
+    @ManyToMany(mappedBy = "contratado")
+    private List<Trabajador> contratados =new ArrayList<>();
 
 };

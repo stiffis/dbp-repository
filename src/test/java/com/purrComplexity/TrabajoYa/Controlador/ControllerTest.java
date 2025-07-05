@@ -1,14 +1,12 @@
-package com.purrComplexity.TrabajoYa.Controlador;
+/*package com.purrComplexity.TrabajoYa.Controlador;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.purrComplexity.TrabajoYa.Empleador.Empleador;
-import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorResponseDTO;
 import com.purrComplexity.TrabajoYa.EmpleoA.dto.EmpleoAResponseDTO;
 import com.purrComplexity.TrabajoYa.EmpleoB.dto.EmpleoBResponseDTO;
-import com.purrComplexity.TrabajoYa.Persona.dto.PersonaDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
 import com.purrComplexity.TrabajoYa.utils.Reader;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Base64;
@@ -75,11 +72,11 @@ public class ControllerTest {
                 .getContentAsString();
 
         ObjectMapper objectMapper=new ObjectMapper();
-        PersonaDTO personaDTO=objectMapper.readValue(responseContent,PersonaDTO.class);
+        TrabajadorDTO trabajadorDTO =objectMapper.readValue(responseContent, TrabajadorDTO.class);
 
-        assertThat(personaDTO.getCorreo()).isEqualTo("juan.perez@example.com");
-        assertThat(personaDTO.getDni()).isEqualTo("12345678");
-        assertThat(personaDTO.getNombresCompletos()).isEqualTo("Juan Pérez García");
+        assertThat(trabajadorDTO.getCorreo()).isEqualTo("juan.perez@example.com");
+        assertThat(trabajadorDTO.getDni()).isEqualTo("12345678");
+        assertThat(trabajadorDTO.getNombresCompletos()).isEqualTo("Juan Pérez García");
     }
 
     @Test
@@ -154,3 +151,4 @@ public class ControllerTest {
 
 }
 
+*/

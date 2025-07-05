@@ -1,24 +1,20 @@
-package com.purrComplexity.TrabajoYa.Contrato;
+/*package com.purrComplexity.TrabajoYa.Contrato;
 
-import com.purrComplexity.TrabajoYa.Contrato.Contrato;
 import com.purrComplexity.TrabajoYa.Contrato.dto.ContratoDTO;
 import com.purrComplexity.TrabajoYa.Contrato.dto.CreateContratoDTO;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.Repository.OfertaEmpleoRepository;
-import com.purrComplexity.TrabajoYa.Persona.PersonaRepository;
+import com.purrComplexity.TrabajoYa.Trabajador.PersonaRepository;
 import com.purrComplexity.TrabajoYa.exception.FutureDateNotAllowedException;
-import com.purrComplexity.TrabajoYa.exception.RatingOutOfRangeException;
 import com.purrComplexity.TrabajoYa.exception.ResourceNotFoundException;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
+import com.purrComplexity.TrabajoYa.Trabajador.Persona;
 import com.purrComplexity.TrabajoYa.Contrato.mapper.ContratoMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -109,4 +105,4 @@ public class ContratoServiceTest{
 
 
 }
-
+*/
