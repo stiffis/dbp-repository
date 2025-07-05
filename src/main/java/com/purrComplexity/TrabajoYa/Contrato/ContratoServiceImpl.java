@@ -7,15 +7,14 @@ import com.purrComplexity.TrabajoYa.Contrato.mapper.ContratoMapper;
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.Repository.OfertaEmpleoRepository;
-import com.purrComplexity.TrabajoYa.exception.TrabajadorNotFound;
+import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
+import com.purrComplexity.TrabajoYa.exception.*;
 import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
 import com.purrComplexity.TrabajoYa.Trabajador.TrabajadorRepository;
 import com.purrComplexity.TrabajoYa.email.EmailService;
-import com.purrComplexity.TrabajoYa.exception.ContratoNotFound;
-import com.purrComplexity.TrabajoYa.exception.FutureDateNotAllowedException;
-import com.purrComplexity.TrabajoYa.exception.RatingOutOfRangeException;
-import com.purrComplexity.TrabajoYa.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -30,26 +29,35 @@ public class ContratoServiceImpl implements ContratoService {
     private final OfertaEmpleoRepository ofertaEmpleoRepository;
     private final ContratoMapper contratoMapper;
     private final EmailService emailService;
+    private final UserAccountRepository userAccountRepository;
 
     @Override
-    public ContratoDTO createContrato(CreateContratoDTO createContratoDTO) {
-        Long personaId = createContratoDTO.personaContratadaId();
-        Long ofertaEmpleoId = createContratoDTO.ofertaEmpleoId();
+    public ContratoDTO createContrato(Long idUsuario,Long idOfertaEmpleo, Long idTrabajador, CreateContratoDTO createContratoDTO) {
 
-        Trabajador trabajador = trabajadorRepository.findById(personaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Persona no encontrada con id: " + personaId));
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("El usuario no existe"));
 
-        OfertaEmpleo oferta = ofertaEmpleoRepository.findById(ofertaEmpleoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Oferta de empleo no encontrada con id: " + ofertaEmpleoId));
+        Trabajador trabajador = trabajadorRepository.findById(idTrabajador)
+                .orElseThrow(TrabajadorNotFound::new);
+
+        OfertaEmpleo oferta = ofertaEmpleoRepository.findById(idOfertaEmpleo)
+                .orElseThrow(OfertaEmpleoNotFound::new);
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
+
+        if (!userAccount.getEmpresario().getRuc().equals(oferta.getEmpleador().getRuc())){
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
+        }
 
         Empleador empleador = oferta.getEmpleador();
 
-        if (createContratoDTO.fechaCreacion().after(new Date())) {
-            throw new FutureDateNotAllowedException(createContratoDTO.fechaCreacion());
+        if (createContratoDTO.getFechaCreacion().after(new Date())) {
+            throw new FutureDateNotAllowedException(createContratoDTO.getFechaCreacion());
         }
 
-        if (createContratoDTO.calificaciones() != null) {
-            createContratoDTO.calificaciones().forEach(puntaje -> {
+        if (createContratoDTO.getCalificaciones() != null) {
+            createContratoDTO.getCalificaciones().forEach(puntaje -> {
                 if (puntaje < 1 || puntaje > 5) {
                     throw new RatingOutOfRangeException("Calificaciones deben ser 1-5");
                 }
@@ -88,6 +96,9 @@ Equipo TrabajoYa
 """;
 
         emailService.sendSimpleMessage(trabajador.getCorreo(), "Confirmación de nuevo contrato en TrabajoYa", mensajePersona);
+
+        ContratoDTO contratoDTO=contratoMapper.toDTO(savedContrato);
+
 
         return contratoMapper.toDTO(savedContrato);
     }

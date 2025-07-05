@@ -20,17 +20,13 @@ public class CreateContratoDTO {
 }
 */
 
-
-public record CreateContratoDTO(
-        @NotNull(message = "La persona contratada es obligatoria")
-        Long personaContratadaId,
-
-        @NotNull(message = "La oferta de empleo es obligatoria")
-        Long ofertaEmpleoId,
+@Data
+public class CreateContratoDTO {
 
         @PastOrPresent(message = "La fecha de creación no puede ser futura")
-        Date fechaCreacion,
+        private Date fechaCreacion;
 
         @Valid
-        List<@Min(1) @Max(5) Integer> calificaciones
-) {}
+        private List<@Min(1) @Max(5) Integer> calificaciones;
+
+}

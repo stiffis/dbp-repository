@@ -134,7 +134,6 @@ public class AplicationController {
         return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
-
     @PatchMapping("/actualizar/OfertaEmpleo/tipoA/{id}") //
     public ResponseEntity<EmpleoResponseDTO> actualizarParcialmenteEmpleoA(@RequestBody EmpleoRequestDTO empleoARequestDTO, @PathVariable Long id){
         EmpleoResponseDTO response = empleoAService.actualizarParcialmenteEmpleoA(id, empleoARequestDTO);
@@ -142,12 +141,12 @@ public class AplicationController {
         return ResponseEntity.ok(response);
     }
 
-
-    @PostMapping("/contrato/crearnuevo")
+    @PostMapping("/contrato/crearnuevo/{id_usuario}/{id_oferta_empleo}/{id_trabajador}")
     public ResponseEntity<ContratoDTO> createContrato(
-            @Valid @RequestBody CreateContratoDTO createContratoDTO) {
+            @Valid @RequestBody CreateContratoDTO createContratoDTO, @PathVariable Long id_usuario, @PathVariable Long id_trabajador,
+            @PathVariable Long id_oferta_empleo) {
 
-        ContratoDTO contratoDTO = contratoService.createContrato(createContratoDTO);
+        ContratoDTO contratoDTO = contratoService.createContrato(id_usuario,id_oferta_empleo,id_trabajador,createContratoDTO);
 
     URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ContratoService {
 
-    ContratoDTO createContrato(CreateContratoDTO createContratoDTO);
+    ContratoDTO createContrato(Long idUsuario ,Long idOfertaEmpleo, Long idTrabajador, CreateContratoDTO createContratoDTO);
     ContratoDTO getContratoById(Long id);
     List<ContratoDTO> getAllContratos();
     ContratoDTO updateContrato(Long id, UpdateContratoDTO contratoDTO);

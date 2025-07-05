@@ -1,7 +1,6 @@
 package com.purrComplexity.TrabajoYa.Trabajador;
 
 import com.purrComplexity.TrabajoYa.Contrato.Contrato;
-import com.purrComplexity.TrabajoYa.Enum.Habilidad;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
 import jakarta.persistence.*;
@@ -29,8 +28,8 @@ public class Trabajador {
     private String correo;
     private Date fechaNacimiento;
 // ubicacion, correo, fecha de nacimient, habilidad, dni, nombresCompletos, calificaciones, contratos,
-    @Enumerated(EnumType.STRING)
-    private Habilidad habilidades;
+
+    private String habilidades;
 
     private String dni;
     private String nombresCompletos;

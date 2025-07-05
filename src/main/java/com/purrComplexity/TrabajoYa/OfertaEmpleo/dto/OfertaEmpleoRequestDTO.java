@@ -1,6 +1,5 @@
 package com.purrComplexity.TrabajoYa.OfertaEmpleo.dto;
 
-import com.purrComplexity.TrabajoYa.Enum.Habilidad;
 import com.purrComplexity.TrabajoYa.Enum.SistemaRemuneracion;
 import com.purrComplexity.TrabajoYa.Enum.WeekDays;
 import com.purrComplexity.TrabajoYa.Enum.modalidad;
@@ -22,8 +21,7 @@ public class OfertaEmpleoRequestDTO {
 
     private String lugar;
 
-    @Enumerated(EnumType.STRING)
-    private Habilidad habilidades;
+    private String habilidades;
 
     private Long numeroPostulaciones;
 
