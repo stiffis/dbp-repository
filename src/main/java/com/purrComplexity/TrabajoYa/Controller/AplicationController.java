@@ -1,28 +1,25 @@
 package com.purrComplexity.TrabajoYa.Controller;
 
+import com.purrComplexity.TrabajoYa.CalificacionTrabajador.dto.CalificacionTrabajadorRequestDTO;
+import com.purrComplexity.TrabajoYa.CalificacionTrabajador.dto.CalificacionTrabajadorResponseDTO;
 import com.purrComplexity.TrabajoYa.Contrato.ContratoService;
 import com.purrComplexity.TrabajoYa.Contrato.dto.ContratoDTO;
 import com.purrComplexity.TrabajoYa.Contrato.dto.CreateContratoDTO;
+import com.purrComplexity.TrabajoYa.Empleo.Service.EmpleoService;
+import com.purrComplexity.TrabajoYa.Empleo.dto.EmpleoRequestDTO;
+import com.purrComplexity.TrabajoYa.Empleo.dto.EmpleoResponseDTO;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.Service.CalificacionEmpresaService;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.dto.CalificacionEmpresaRequestDTO;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.dto.CalificacionEmpresaResponseDTO;
-import com.purrComplexity.TrabajoYa.CalificacionPersona.Service.CalificacionPersonaService;
-import com.purrComplexity.TrabajoYa.CalificacionPersona.dto.CalificacionPersonaRequestDTO;
-import com.purrComplexity.TrabajoYa.CalificacionPersona.dto.CalificacionPersonaResponseDTO;
+import com.purrComplexity.TrabajoYa.CalificacionTrabajador.Service.CalificacionTrabajadorService;
 import com.purrComplexity.TrabajoYa.Empleador.Service.EmpleadorService;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorRequestDTO;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorResponseDTO;
-import com.purrComplexity.TrabajoYa.EmpleoA.Service.EmpleoAService;
-import com.purrComplexity.TrabajoYa.EmpleoA.dto.EmpleoARequestDTO;
-import com.purrComplexity.TrabajoYa.EmpleoA.dto.EmpleoAResponseDTO;
-import com.purrComplexity.TrabajoYa.EmpleoB.Service.EmpleoBService;
-import com.purrComplexity.TrabajoYa.EmpleoB.dto.EmpleoBRequestDTO;
-import com.purrComplexity.TrabajoYa.EmpleoB.dto.EmpleoBResponseDTO;
-import com.purrComplexity.TrabajoYa.Persona.PersonaServiceImpl;
-import com.purrComplexity.TrabajoYa.Persona.dto.AceptadoDTO;
-import com.purrComplexity.TrabajoYa.Persona.dto.CreatePersonaDTO;
-import com.purrComplexity.TrabajoYa.Persona.dto.PersonaDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.TrabajadorServiceImpl;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.AceptadoDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.CreateTrabajadorDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
 import com.purrComplexity.TrabajoYa.Service.AplicationService;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
 import com.purrComplexity.TrabajoYa.email.EmailEvent;
@@ -51,11 +48,10 @@ import java.util.List;
 public class AplicationController {
 
     private final EmpleadorService empleadorService;
-    private final PersonaServiceImpl personaServiceImpl;
-    private final EmpleoAService empleoAService;
-    private final EmpleoBService empleoBService;
+    private final TrabajadorServiceImpl trabajadorServiceImpl;
+    private final EmpleoService empleoAService;
     private final ContratoService contratoService;
-    private final CalificacionPersonaService calificacionPersonaService;
+    private final CalificacionTrabajadorService calificacionTrabajadorService;
     private final CalificacionEmpresaService calificacionEmpresaService;
     private final ApplicationEventPublisher eventPublisher;
     private final AplicationService aplicationService;
@@ -81,35 +77,35 @@ public class AplicationController {
 
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/persona")
-    public ResponseEntity<PersonaDTO> postPersona(@RequestBody CreatePersonaDTO persona) {
+    public ResponseEntity<TrabajadorDTO> postPersona(@RequestBody CreateTrabajadorDTO persona) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        PersonaDTO createPersonaDTO = personaServiceImpl.createPersona(idUsuario, persona);
+        TrabajadorDTO createTrabajadorDTO = trabajadorServiceImpl.createPersona(idUsuario, persona);
 
-        if (createPersonaDTO == null) {
+        if (createTrabajadorDTO == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         // Asumiendo que createPersonaDTO tiene el email
-        String email = createPersonaDTO.getCorreo();
+        String email = createTrabajadorDTO.getCorreo();
 
         // Publicar evento para enviar correo
         eventPublisher.publishEvent(new EmailEvent(email, "PERSONA"));
         System.out.println("Evento email publicado para persona: " + email);
 
-        return new ResponseEntity<>(createPersonaDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(createTrabajadorDTO, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/crear/ofertaEmpleo/tipoA")
-    public ResponseEntity<EmpleoAResponseDTO> crearEmpleoA(@RequestBody EmpleoARequestDTO empleoARequestDTO){
+    public ResponseEntity<EmpleoResponseDTO> crearEmpleoA(@RequestBody EmpleoRequestDTO empleoARequestDTO){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        EmpleoAResponseDTO empleoAResponseDTO=empleoAService.crearYAsignarEmpleoA(empleoARequestDTO,idUsuario);
+        EmpleoResponseDTO empleoAResponseDTO=empleoAService.crearYAsignarEmpleoA(empleoARequestDTO,idUsuario);
 
         return new ResponseEntity<>(empleoAResponseDTO,HttpStatus.CREATED);
     }
@@ -121,7 +117,7 @@ public class AplicationController {
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        AceptadoDTO aceptadoDTO=aplicationService.aceptarPersona(idUsuario,id_empleo,id_postulante);
+        AceptadoDTO aceptadoDTO=aplicationService.aceptarTrabajador(idUsuario,id_empleo,id_postulante);
 
         return new ResponseEntity<>(aceptadoDTO,HttpStatus.OK);
     }
@@ -133,31 +129,19 @@ public class AplicationController {
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        String message=aplicationService.rechazarPersona(idUsuario,id_empleo,id_postulante);
+        String message=aplicationService.rechazarTrabajador(idUsuario,id_empleo,id_postulante);
 
         return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('USUARIO')")
-    @PostMapping("/crear/ofertaEmpleo/tipoB/{rucEmpleador}")
-    public ResponseEntity<EmpleoBResponseDTO> crearEmpleoB(@RequestBody EmpleoBRequestDTO empleoBRequestDTO, @PathVariable String rucEmpleador){
-        EmpleoBResponseDTO empleoBResponseDTO=empleoBService.crearYAsignarEmpleoB(empleoBRequestDTO,rucEmpleador);
-
-        return new ResponseEntity<>(empleoBResponseDTO,HttpStatus.CREATED);
-    }
 
     @PatchMapping("/actualizar/OfertaEmpleo/tipoA/{id}") //
-    public ResponseEntity<EmpleoAResponseDTO> actualizarParcialmenteEmpleoA(@RequestBody EmpleoARequestDTO empleoARequestDTO, @PathVariable Long id){
-        EmpleoAResponseDTO response = empleoAService.actualizarParcialmenteEmpleoA(id, empleoARequestDTO);
+    public ResponseEntity<EmpleoResponseDTO> actualizarParcialmenteEmpleoA(@RequestBody EmpleoRequestDTO empleoARequestDTO, @PathVariable Long id){
+        EmpleoResponseDTO response = empleoAService.actualizarParcialmenteEmpleoA(id, empleoARequestDTO);
 
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/actualizar/OfertaEmpleo/tipoB/{id}") //
-    public ResponseEntity<EmpleoBResponseDTO> actualizarParcialmenteEmpleoB(@RequestBody EmpleoBRequestDTO empleoBRequestDTO, @PathVariable Long id){
-        EmpleoBResponseDTO response = empleoBService.actualizarParcialmenteEmpleoB(id, empleoBRequestDTO);
-        return ResponseEntity.ok(response);
-    }
 
     @PostMapping("/contrato/crearnuevo")
     public ResponseEntity<ContratoDTO> createContrato(
@@ -175,9 +159,9 @@ public class AplicationController {
     }
 
     @PostMapping("/calificar/Trabajador/{idContrato}/{idPersona}")
-    public ResponseEntity<CalificacionPersonaResponseDTO> crearCalificacionPersona(@RequestBody CalificacionPersonaRequestDTO calificacionPersonaRequestDTO
-            ,@PathVariable Long idContrato, @PathVariable Long idPersona){
-        CalificacionPersonaResponseDTO calificacionPersonaResponseDTO = calificacionPersonaService.crearCalificacion(idContrato, idPersona, calificacionPersonaRequestDTO);
+    public ResponseEntity<CalificacionTrabajadorResponseDTO> crearCalificacionPersona(@RequestBody CalificacionTrabajadorRequestDTO calificacionPersonaRequestDTO
+            , @PathVariable Long idContrato, @PathVariable Long idPersona){
+        CalificacionTrabajadorResponseDTO calificacionPersonaResponseDTO = calificacionTrabajadorService.crearCalificacion(idContrato, idPersona, calificacionPersonaRequestDTO);
 
         return new ResponseEntity<>(calificacionPersonaResponseDTO,HttpStatus.CREATED);
     }
@@ -191,8 +175,8 @@ public class AplicationController {
     }
 
     @GetMapping("/persona/{id}")
-    public ResponseEntity<PersonaDTO> getPersona(@PathVariable Long id) {
-        PersonaDTO persona = personaServiceImpl.getPersonaById(id);
+    public ResponseEntity<TrabajadorDTO> getPersona(@PathVariable Long id) {
+        TrabajadorDTO persona = trabajadorServiceImpl.getPersonaById(id);
         return ResponseEntity.ok(persona);
     }
 
@@ -244,14 +228,14 @@ public class AplicationController {
     }
 
     @GetMapping("/mis/postulantes/oferta/{id_ofertaEmpleo}")
-    public ResponseEntity<List<PersonaDTO>> getPostulantesOferta(@PathVariable Long id_ofertaEmpleo){
+    public ResponseEntity<List<TrabajadorDTO>> getPostulantesOferta(@PathVariable Long id_ofertaEmpleo){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
         Long idUsuario = detallesUser.getId();
 
-        List<PersonaDTO> personaDTOS=aplicationService.obtenerPostulantes(idUsuario,id_ofertaEmpleo);
+        List<TrabajadorDTO> trabajadorDTOS =aplicationService.obtenerPostulantes(idUsuario,id_ofertaEmpleo);
 
-        return new ResponseEntity<>(personaDTOS,HttpStatus.OK);
+        return new ResponseEntity<>(trabajadorDTOS,HttpStatus.OK);
     }
 
     @GetMapping("/ofertas/cercanas/{radio_metros}")

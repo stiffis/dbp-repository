@@ -1,7 +1,7 @@
 package com.purrComplexity.TrabajoYa.User;
 
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
+import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class UserAccount implements UserDetails {
 
     @OneToOne
     @JoinColumn(name = "trabajador_id")
-    private Persona trabajador;
+    private Trabajador trabajador;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

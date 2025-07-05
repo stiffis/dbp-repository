@@ -1,11 +1,7 @@
 package com.purrComplexity.TrabajoYa.AplicaA;
 
 
-import com.purrComplexity.TrabajoYa.EmpleoA.EmpleoA;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
 import jakarta.persistence.*;
-
-import java.util.List;
 
 @Entity
 public class AplicaA {

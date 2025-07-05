@@ -1,23 +1,19 @@
 package com.purrComplexity.TrabajoYa.Service;
 
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
-import com.purrComplexity.TrabajoYa.Empleador.Exceptions.EmpleadorNotFound;
 import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.Repository.OfertaEmpleoRepository;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.dto.OfertaEmpleoResponseDTO;
-import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaNotFound;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
-import com.purrComplexity.TrabajoYa.Persona.PersonaRepository;
-import com.purrComplexity.TrabajoYa.Persona.dto.AceptadoDTO;
-import com.purrComplexity.TrabajoYa.Persona.dto.PersonaDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
+import com.purrComplexity.TrabajoYa.Trabajador.TrabajadorRepository;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.AceptadoDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
 import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
-import com.purrComplexity.TrabajoYa.exception.EmpleoNotFound;
-import com.purrComplexity.TrabajoYa.exception.NoEmpleadorException;
+import com.purrComplexity.TrabajoYa.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -32,44 +28,44 @@ import java.util.stream.Collectors;
 public class AplicationService {
 
     private final OfertaEmpleoRepository ofertaEmpleoRepository;
-    private final PersonaRepository personaRepository;
+    private final TrabajadorRepository trabajadorRepository;
     private final EmpleadorRepository empleadorRepository;
     private final UserAccountRepository userAccountRepository;
     private final ModelMapper modelMapper;
 
-    public AceptadoDTO aceptarPersona(Long idUsuario,Long idEmpleo, Long idPostulante){
-        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(idEmpleo).orElseThrow(()-> new EmpleoNotFound("No se encontro el emeplo"));
-        Persona persona=personaRepository.findById(idPostulante).orElseThrow(()-> new PersonaNotFound("No se encontró la persona"));
+    public AceptadoDTO aceptarTrabajador(Long idUsuario,Long idEmpleo, Long idPostulante){
+        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(idEmpleo).orElseThrow(EmpleadorNotFound::new);
+        Trabajador trabajador= trabajadorRepository.findById(idPostulante).orElseThrow(TrabajadorNotFound::new);
 
         UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()-> new RuntimeException("No existe el usuario"));
 
-        Empleador empleador=userAccount.getEmpresario();
-
-        if (empleador==null){
-            throw new RuntimeException("El usuario no se creo una cuenta para ser empleador");
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
         }
 
-        List<Persona> postulantes=ofertaEmpleo.getPostulantes();
+        Empleador empleador=userAccount.getEmpresario();
+
+        List<Trabajador> postulantes=ofertaEmpleo.getPostulantes();
 
         if (!Objects.equals(ofertaEmpleo.getEmpleador().getRuc(), empleador.getRuc())){
-            throw new RuntimeException("No puedes contratar a esta persona porque tu no creaste el empleo");
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
         }
 
         boolean esPostulante = postulantes.stream()
                 .anyMatch(p -> p.getId().equals(idPostulante));
 
         if (!esPostulante) {
-            throw new IllegalArgumentException("La persona no ha postulado a esta oferta");
+            throw new PostulanteNoEncontradoEnOfertaException();
         }
 
 
-        persona.getAceptado().add(ofertaEmpleo);
+        trabajador.getContratado().add(ofertaEmpleo);
 
-        personaRepository.save(persona);
+        trabajadorRepository.save(trabajador);
 
         AceptadoDTO aceptadoDTO= new AceptadoDTO();
 
-        aceptadoDTO.setNombreCompletoEmpleado(persona.getNombresCompletos());
+        aceptadoDTO.setNombreCompletoEmpleado(trabajador.getNombresCompletos());
         aceptadoDTO.setIdEmpleo(idEmpleo);
         aceptadoDTO.setLatitud(ofertaEmpleo.getLatitud());
         aceptadoDTO.setLongitud(ofertaEmpleo.getLongitud());
@@ -78,86 +74,87 @@ public class AplicationService {
         return aceptadoDTO;
     }
 
-    public String rechazarPersona(Long idUsuario,Long idEmpleo,Long idPostulante){
+    public String rechazarTrabajador(Long idUsuario,Long idEmpleo,Long idPostulante){
 
-        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(idEmpleo).orElseThrow(()-> new EmpleoNotFound("No se encontro el emeplo"));
-        Persona persona=personaRepository.findById(idPostulante).orElseThrow(()-> new PersonaNotFound("No se encontró la persona"));
+        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(idEmpleo).orElseThrow(OfertaEmpleoNotFound::new);
+        Trabajador trabajador= trabajadorRepository.findById(idPostulante).orElseThrow(TrabajadorNotFound::new);
 
-        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()-> new RuntimeException("No existe el usuario ingresado"));
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()-> new RuntimeException("No existe el usuario"));
+
+
+        if (!userAccount.getIsTrabajador()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
 
         Empleador empleador=userAccount.getEmpresario();
 
-        if (empleador==null){
-            throw new RuntimeException("El usuario no se creo una cuenta para ser empleador O es un usuario comun (usuario no empresario");
-        }
-
-        List<Persona> postulantes=ofertaEmpleo.getPostulantes();
+        List<Trabajador> postulantes=ofertaEmpleo.getPostulantes();
 
         if (!Objects.equals(ofertaEmpleo.getEmpleador().getRuc(), empleador.getRuc())){
-            throw new RuntimeException("No puedes rechazar a esta persona porque tu no creaste el empleo");
-        } // previene que un empleador B rechace a un postulante de un empleo creado por el empleador A
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
+        }
 
         boolean esPostulante = postulantes.stream()
                 .anyMatch(p -> p.getId().equals(idPostulante));
 
         if (!esPostulante) {
-            throw new IllegalArgumentException("La persona no ha postulado a esta oferta");
+            throw new PostulanteNoEncontradoEnOfertaException();
         }
 
-        persona.getPostulaste().remove(ofertaEmpleo);
+        trabajador.getPostulaste().remove(ofertaEmpleo);
 
-        personaRepository.save(persona);
+        trabajadorRepository.save(trabajador);
 
         return "Postulante rechazado con éxito";
     }
 
-
     public String postularEmpleo(Long idOferta, Long idUsuario) {
 
         OfertaEmpleo ofertaEmpleo = ofertaEmpleoRepository.findById(idOferta).
-                orElseThrow(() -> new EmpleoNotFound("No se encontró la oferta de empleo con ID: "));
-        UserAccount userAccount = userAccountRepository.findById(idUsuario).orElseThrow(() -> new RuntimeException("No existe el usuario ingresado"));
-        Persona persona = userAccount.getTrabajador();
+                orElseThrow(OfertaEmpleoNotFound::new);
+        UserAccount userAccount = userAccountRepository.findById(idUsuario).orElseThrow(() -> new RuntimeException("No existe el usuario"));
+        Trabajador trabajador = userAccount.getTrabajador();
 
         // verificar si la persona ya postuló a esta oferta
-        if (persona.getPostulaste().stream().anyMatch(oferta -> oferta.getIdOfertaEmpleo().equals(idOferta))) {
-            throw new RuntimeException("Ya has postulado a esta oferta de empleo");
+        if (trabajador.getPostulaste().stream().anyMatch(oferta -> oferta.getIdOfertaEmpleo().equals(idOferta))) {
+            throw new PostulacionDuplicadaException();
         }
 
         // Agregar la oferta de empleo a la lista de postulaciones de la persona
         // guardar la
-        persona.getPostulaste().add(ofertaEmpleo);
+        trabajador.getPostulaste().add(ofertaEmpleo);
 
-        personaRepository.save(persona);
+        trabajadorRepository.save(trabajador);
 
         return "Postulación exitosa para la oferta de empleo: " + ofertaEmpleo.getIdOfertaEmpleo();
     }
 
     public List<OfertaEmpleo> obtenerEmpleos(Long userID){
-        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No se encontró al usuario"));
+        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
 
-        Empleador empleador=userAccount.getEmpresario();
 
-        if (empleador == null) {
+        if (!userAccount.getIsEmpresario()) {
             return Collections.emptyList();
         }
+
+        Empleador empleador=userAccount.getEmpresario();
 
         return empleador.getOfertas();
 
     }
 
     public List<OfertaEmpleoResponseDTO> obtenerPostulaciones(Long userID){
-        UserAccount userAccount= userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No se encontró el usuario"));
+        UserAccount userAccount= userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
 
         if (!userAccount.getIsTrabajador()){
-            throw new RuntimeException("El usuario no esta registrado como trabajador");
+            throw new UsuarioNoEsTrabajadorException();
         }
 
-        Persona persona=userAccount.getTrabajador();
+        Trabajador trabajador=userAccount.getTrabajador();
 
         List<OfertaEmpleoResponseDTO> ofertaEmpleoResponseDTOS = new ArrayList<>();
 
-        for (OfertaEmpleo oferta : persona.getPostulaste()) {
+        for (OfertaEmpleo oferta : trabajador.getPostulaste()) {
             OfertaEmpleoResponseDTO dto = modelMapper.map(oferta, OfertaEmpleoResponseDTO.class);
             ofertaEmpleoResponseDTOS.add(dto);
         }
@@ -166,29 +163,28 @@ public class AplicationService {
 
     }
 
-    public List<PersonaDTO> obtenerPostulantes(Long userID, Long ofertaEmpleoID){
-        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new RuntimeException("El usuario no fue encontrado"));
-        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(ofertaEmpleoID).orElseThrow(()->new RuntimeException("No existe la oferta de empleo"));
+    public List<TrabajadorDTO> obtenerPostulantes(Long userID, Long ofertaEmpleoID){
+        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new RuntimeException("No existe el usuario"));
+        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(ofertaEmpleoID).orElseThrow(OfertaEmpleoNotFound::new);
 
         if (!userAccount.getIsEmpresario()){
-            throw new NoEmpleadorException("El usuario no está registrado como empleador");
-        }
-        //Dudable
-
-        if (userAccount.getEmpresario().getRuc()!=ofertaEmpleo.getEmpleador().getRuc()){
-            throw new RuntimeException("La oferta de empleo no le pertenece al usuario");
+            throw new UsuarioNoEsEmpleadorException();
         }
 
-        List<PersonaDTO> personaDTOS=new ArrayList<>();
-
-        List<Persona> personas=ofertaEmpleo.getPostulantes();
-
-        for (Persona postulante:personas){
-            PersonaDTO personaDTO=modelMapper.map(postulante,PersonaDTO.class);
-            personaDTOS.add(personaDTO);
+        if (!userAccount.getEmpresario().getRuc().equals(ofertaEmpleo.getEmpleador().getRuc())) {
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
         }
 
-        return personaDTOS;
+        List<TrabajadorDTO> trabajadorDTOS =new ArrayList<>();
+
+        List<Trabajador> trabajadores=ofertaEmpleo.getPostulantes();
+
+        for (Trabajador postulante:trabajadores){
+            TrabajadorDTO trabajadorDTO =modelMapper.map(postulante, TrabajadorDTO.class);
+            trabajadorDTOS.add(trabajadorDTO);
+        }
+
+        return trabajadorDTOS;
     }
 
     public double calcularDistancia(double lat1, double lon1, double lat2, double lon2) {
@@ -208,16 +204,16 @@ public class AplicationService {
 
     public List<OfertaEmpleoResponseDTO> getOfertasEmpleoCercanos(Long idUsuario, Double radioEnMetros) {
 
-        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("No se encontró al usuario"));
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
 
         if (!userAccount.getIsTrabajador()){
-            throw new RuntimeException("El usuario no esta registrado como trabajador");
+            throw new UsuarioNoEsTrabajadorException();
         }
 
-        Persona persona=userAccount.getTrabajador();
+        Trabajador trabajador=userAccount.getTrabajador();
 
-        Double lat=persona.getLatitud();
-        Double lng=persona.getLongitud();
+        Double lat=trabajador.getLatitud();
+        Double lng=trabajador.getLongitud();
 
         return ofertaEmpleoRepository.findAll().stream()
                 .filter(ofertaEmpleo -> {

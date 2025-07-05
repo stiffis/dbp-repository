@@ -12,6 +12,6 @@ public interface ContratoService {
     List<ContratoDTO> getAllContratos();
     ContratoDTO updateContrato(Long id, UpdateContratoDTO contratoDTO);
     void deleteContrato(Long id);
-    List<ContratoDTO> getContratosByPersonaId(Long personaId);
+    List<ContratoDTO> getContratosByTrabajadorId(Long personaId);
 }
 

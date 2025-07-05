@@ -2,8 +2,6 @@ package com.purrComplexity.TrabajoYa.Empleador;
 
 
 import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
-import com.purrComplexity.TrabajoYa.EmpleoA.EmpleoA;
-import com.purrComplexity.TrabajoYa.EmpleoA.Repository.EmpleoARepository;
 import com.purrComplexity.TrabajoYa.config.PostgresTestContainerConfig;
 
 import org.junit.jupiter.api.Test;
@@ -14,9 +12,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.time.LocalDateTime;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

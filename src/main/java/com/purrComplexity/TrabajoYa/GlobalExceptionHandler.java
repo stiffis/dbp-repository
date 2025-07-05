@@ -1,12 +1,10 @@
 package com.purrComplexity.TrabajoYa;
 
-import com.purrComplexity.TrabajoYa.Empleador.Exceptions.EmpleadorNotFound;
-import com.purrComplexity.TrabajoYa.Empleador.Exceptions.EmpleadorWithTheSameCorreo;
-import com.purrComplexity.TrabajoYa.Empleador.Exceptions.EmpleadorWithTheSameRUC;
-import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaNotFound;
-import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaWithSameCorreo;
-import com.purrComplexity.TrabajoYa.exception.EmpleoNotFound;
-import com.purrComplexity.TrabajoYa.exception.NoEmpleadorException;
+import com.purrComplexity.TrabajoYa.exception.EmpleadorNotFound;
+import com.purrComplexity.TrabajoYa.exception.EmpleadorWithTheSameCorreo;
+import com.purrComplexity.TrabajoYa.exception.EmpleadorWithTheSameRUC;
+import com.purrComplexity.TrabajoYa.exception.TrabajadorNotFound;
+import com.purrComplexity.TrabajoYa.exception.*;
 import org.modelmapper.spi.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +28,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    @ExceptionHandler(PersonaWithSameCorreo.class)
-    public ResponseEntity<ErrorMessage> handelPersonaWithSameCorreo(PersonaWithSameCorreo ex){
+    @ExceptionHandler(TrabajadorWithSameCorreo.class)
+    public ResponseEntity<ErrorMessage> handelPersonaWithSameCorreo(TrabajadorWithSameCorreo ex){
         ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
-    @ExceptionHandler(PersonaNotFound.class)
-    public ResponseEntity<ErrorMessage> handlePersonaNotFound(PersonaNotFound ex){
+
+    @ExceptionHandler(TrabajadorNotFound.class)
+    public ResponseEntity<ErrorMessage> handlePersonaNotFound(TrabajadorNotFound ex){
         ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
     }
@@ -57,5 +56,74 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "error", ex.getMessage()
         ));
+    }
+
+    @ExceptionHandler(ContratoNotFound.class)
+    public ResponseEntity<?> handleContratoNotFound(ContratoNotFound ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+    }
+
+    @ExceptionHandler(ContratoNotInEmpleador.class)
+    public ResponseEntity<?> handleContratoNotInEmpleador(ContratoNotInEmpleador ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(ContratoNotInTrabajador.class)
+    public ResponseEntity<?> handleContratoNotInTrabajador(ContratoNotInTrabajador ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(UsuarioYaEsEmpleadorException.class)
+    public ResponseEntity<?> handleUsuarioYaEsEmpleadorException(UsuarioYaEsEmpleadorException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(UsuarioNoEsEmpleadorException.class)
+    public ResponseEntity<?> handleUsuarioNoEsEmpleadorException(UsuarioNoEsEmpleadorException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(OfertaEmpleoNoPerteneceAlEmpleadorException.class)
+    public ResponseEntity<?> handleOfertaEmpleoNoPerteneceAlEmpleadorException(OfertaEmpleoNoPerteneceAlEmpleadorException ex){
+        ErrorMessage errorMessage= new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(PostulanteNoEncontradoEnOfertaException.class)
+    public ResponseEntity<?> handlePostulanteNoEncontradoEnOfertaException(PostulanteNoEncontradoEnOfertaException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(OfertaEmpleoNotFound.class)
+    public ResponseEntity<?> handleOfertaEmpleoNotFound(OfertaEmpleoNotFound ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+    }
+
+    @ExceptionHandler(PostulacionDuplicadaException.class)
+    public ResponseEntity<?> handlePostulacionDuplicadaException(PostulacionDuplicadaException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(UsuarioNoEsTrabajadorException.class)
+    public ResponseEntity<?> handleUsuarioNoEsTrabajadorException(UsuarioNoEsTrabajadorException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(UsuarioYaEsTrabajadorException.class)
+    public ResponseEntity<?> handleUsuarioYaEsTrabajadorException(UsuarioYaEsTrabajadorException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
 }

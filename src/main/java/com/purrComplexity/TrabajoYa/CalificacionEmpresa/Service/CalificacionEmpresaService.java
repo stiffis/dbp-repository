@@ -8,9 +8,9 @@ import com.purrComplexity.TrabajoYa.Contrato.Contrato;
 import com.purrComplexity.TrabajoYa.Contrato.ContratoRepository;
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
 import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
-import com.purrComplexity.TrabajoYa.Persona.Exceptions.PersonaNotFound;
-import com.purrComplexity.TrabajoYa.Persona.Persona;
-import com.purrComplexity.TrabajoYa.Persona.PersonaRepository;
+import com.purrComplexity.TrabajoYa.exception.TrabajadorNotFound;
+import com.purrComplexity.TrabajoYa.exception.ContratoNotFound;
+import com.purrComplexity.TrabajoYa.exception.ContratoNotInEmpleador;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -23,19 +23,18 @@ public class CalificacionEmpresaService {
     private final EmpleadorRepository empleadorRepository;
     private final ContratoRepository contratoRepository;
 
-
     public CalificacionEmpresaResponseDTO crearCalificacion(Long idContrato, String idEmpresa,
                                                             CalificacionEmpresaRequestDTO calificacionEmpresaRequestDTO){
         Empleador empleador=empleadorRepository.findById(idEmpresa).orElseThrow(
-                ()->new PersonaNotFound("El empleador con ese id no exsite")
+                TrabajadorNotFound::new
         );
 
         Contrato contrato=contratoRepository.findById(idContrato).orElseThrow(
-                ()->new RuntimeException("El contrato con ese id no existe")
+                ContratoNotFound::new
         );
 
-        if (contrato.getOfertaEmpleo().getEmpleador()!=empleador){
-            throw new RuntimeException("Este contrato no pertenece al empleador con este id");
+        if (!contrato.getOfertaEmpleo().getEmpleador().equals(empleador)) {
+            throw new ContratoNotInEmpleador();
         }
 
         CalificacionEmpresa calificacionEmpresa=modelMapper.map(calificacionEmpresaRequestDTO,CalificacionEmpresa.class);
