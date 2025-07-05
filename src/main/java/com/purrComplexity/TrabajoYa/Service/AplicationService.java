@@ -58,8 +58,8 @@ public class AplicationService {
             throw new PostulanteNoEncontradoEnOfertaException();
         }
 
-
         trabajador.getContratado().add(ofertaEmpleo);
+        trabajador.getPostulaste().remove(ofertaEmpleo);
 
         trabajadorRepository.save(trabajador);
 

@@ -8,6 +8,8 @@ import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ContratoMapper {
     
@@ -18,14 +20,33 @@ public class ContratoMapper {
         if (contrato.getTrabajadorContratado() != null) {
             dto.setPersonaContratadaId(contrato.getTrabajadorContratado().getId());
         }
+
+        // Cálculo del promedio de calificaciones
+        Double calificaciones = contrato.getCalificacionPromedio();
+
+        dto.setPromedioCalificaciones(calificaciones);
+
         return dto;
     }
     
     public Contrato toEntity(CreateContratoDTO dto, Trabajador trabajador, OfertaEmpleo ofertaEmpleo) {
         Contrato contrato = new Contrato(); // estoy ya crea todos los campos de un contrato, pero estan vacios inicialmente
-        contrato.setFechaCreacion(dto.fechaCreacion());
+        contrato.setFechaCreacion(dto.getFechaCreacion());
         contrato.setTrabajadorContratado(trabajador);
         contrato.setOfertaEmpleo(ofertaEmpleo);
+
+        // Calcular promedio
+        List<Integer> calificaciones = dto.getCalificaciones();
+        if (calificaciones != null && !calificaciones.isEmpty()) {
+            double promedio = calificaciones.stream()
+                    .mapToInt(Integer::intValue)
+                    .average()
+                    .orElse(0.0);
+            contrato.setCalificacionPromedio(promedio);
+        } else {
+            contrato.setCalificacionPromedio(null);
+        }
+
         return contrato;
     }
     

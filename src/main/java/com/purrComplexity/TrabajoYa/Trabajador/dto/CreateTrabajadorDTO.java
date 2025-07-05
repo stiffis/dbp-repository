@@ -1,6 +1,5 @@
 package com.purrComplexity.TrabajoYa.Trabajador.dto;
 
-import com.purrComplexity.TrabajoYa.Enum.Habilidad;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
@@ -23,8 +22,7 @@ public class CreateTrabajadorDTO {
     @NotNull(message = "La fecha de nacimiento es requerida")
     private Date fechaNacimiento;
 
-    @Enumerated(EnumType.STRING)
-    private Habilidad habilidades;
+    private String habilidades;
     
     @NotBlank(message = "El DNI es requerido")
     private String dni;
