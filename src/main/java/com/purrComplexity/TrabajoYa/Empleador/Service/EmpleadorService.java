@@ -1,6 +1,7 @@
 package com.purrComplexity.TrabajoYa.Empleador.Service;
 
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
+import com.purrComplexity.TrabajoYa.Empleador.dto.UpdateEmpleadorDTO;
 import com.purrComplexity.TrabajoYa.exception.*;
 import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorRequestDTO;
@@ -48,9 +49,20 @@ public class EmpleadorService {
         return modelMapper.map(empleador, EmpleadorResponseDTO.class);
     }
 
-    public void eliminarEmpleador(String id){
+    public void eliminarEmpleador(Long userId,String id){
+
+        UserAccount userAccount= userAccountRepository.findById(userId).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
+
         Empleador empleador=
                 empleadorRepository.findById(id).orElseThrow(TrabajadorNotFound::new);
+
+        if (!userAccount.getEmpresario().getRuc().equals(empleador.getRuc())){
+            throw new EmpleadorNoPerteneceAlUsuarioException();
+        }
 
         empleadorRepository.delete(empleador);
 
@@ -69,14 +81,25 @@ public class EmpleadorService {
         return empleadorResponseDTO;
     }
 
-    public EmpleadorResponseDTO actualizarParcialmenteEmpleador(EmpleadorRequestDTO empleadorRequestDTO, String id){
+    public EmpleadorResponseDTO actualizarParcialmenteEmpleador(Long userID,UpdateEmpleadorDTO updateEmpleadorDTO, String id){
         ModelMapper mapper=new ModelMapper();
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+
+        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
 
         Empleador empleador=
                 empleadorRepository.findById(id).orElseThrow(EmpleadorNotFound::new);
 
-        mapper.map(empleadorRequestDTO,empleador);
+
+        if (!userAccount.getEmpresario().getRuc().equals(empleador.getRuc())){
+            throw new EmpleadorNoPerteneceAlUsuarioException();
+        }
+
+        mapper.map(updateEmpleadorDTO,empleador);
 
         empleador=empleadorRepository.save(empleador);
 

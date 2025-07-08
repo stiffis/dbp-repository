@@ -8,8 +8,7 @@ import com.purrComplexity.TrabajoYa.Empleo.dto.EmpleoRequestDTO;
 import com.purrComplexity.TrabajoYa.Empleo.dto.EmpleoResponseDTO;
 import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
-import com.purrComplexity.TrabajoYa.exception.NoEmpleadorException;
-import com.purrComplexity.TrabajoYa.exception.OfertaEmpleoNotFound;
+import com.purrComplexity.TrabajoYa.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -27,24 +26,24 @@ public class EmpleoService {
     private final ModelMapper modelMapper;
     private final UserAccountRepository userAccountRepository;
 
-    public EmpleoResponseDTO publicarEmpleoA(EmpleoRequestDTO empleoARequestDTO){
-        Empleo empleo=modelMapper.map(empleoARequestDTO,Empleo.class);
+    public void eliminarEmpleo(Long idUsuario,Long id){
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
 
-        empleo =empleoARepository.save(empleo);
-
-        EmpleoResponseDTO empleoAResponseDTO=modelMapper.map(empleo,EmpleoResponseDTO.class);
-
-        return empleoAResponseDTO;
-    }
-
-    public void eliminarEmpleoA(Long id){
         Empleo empleo=
                 empleoARepository.findById(id).orElseThrow(OfertaEmpleoNotFound::new);
+
+
+        if (!userAccount.getEmpresario().getRuc().equals(empleo.getEmpleador().getRuc())){
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
+        }
 
         empleoARepository.delete(empleo);
     }
 
-    public EmpleoResponseDTO actulizarEmpleoA(Long id, EmpleoRequestDTO empleoARequestDTO){
+    public EmpleoResponseDTO actulizarEmpleo(Long id, EmpleoRequestDTO empleoARequestDTO){
         Empleo empleo=
                 empleoARepository.findById(id).orElseThrow(OfertaEmpleoNotFound::new);
 
@@ -58,16 +57,7 @@ public class EmpleoService {
 
     }
 
-    public EmpleoResponseDTO actualizarEmpleoA_nuevo(Long id, EmpleoRequestDTO empleoARequestDTO){
-        Empleo empleo = empleoARepository.findById(id).orElseThrow(OfertaEmpleoNotFound::new);
-        modelMapper.map(empleoARequestDTO,empleo);
-
-        empleo = empleoARepository.save(empleo);
-        EmpleoResponseDTO empleoAResponseDTO = modelMapper.map(empleo, EmpleoResponseDTO.class);
-        return empleoAResponseDTO;
-    }
-
-    public EmpleoResponseDTO actualizarParcialmenteEmpleoA(Long id, EmpleoRequestDTO empleoARequestDTO){
+    public EmpleoResponseDTO actualizarParcialmenteEmpleo(Long id, EmpleoRequestDTO empleoARequestDTO){
         ModelMapper mapper=new ModelMapper();
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
@@ -104,20 +94,20 @@ public class EmpleoService {
         return empleoAResponseDTOS;
     }
 
-    public EmpleoResponseDTO crearYAsignarEmpleoA(EmpleoRequestDTO empleoARequestDTO, Long idUsuario){
+    public EmpleoResponseDTO crearYAsignarEmpleo(EmpleoRequestDTO empleoRequestDTO, Long idUsuario){
 
         UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("El usuario no existe"));
 
         if (!userAccount.getIsEmpresario()){
-            throw new NoEmpleadorException("El usuario no tiene asociado una cuenta empleador");
+            throw new UsuarioNoEsTrabajadorException();
         }
 
         String id=userAccount.getEmpresario().getRuc();
 
-        Empleo empleo =modelMapper.map(empleoARequestDTO,Empleo.class);
+        Empleo empleo =modelMapper.map(empleoRequestDTO,Empleo.class);
 
         Empleador empleador=
-                empleadorRepository.findById(id).orElseThrow(()->new RuntimeException("No existe un empresario con ese ruc"));
+                empleadorRepository.findById(id).orElseThrow(EmpleadorNotFound::new);
 
         empleo.setEmpleador(empleador);
 
