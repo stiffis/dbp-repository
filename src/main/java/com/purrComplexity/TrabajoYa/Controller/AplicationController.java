@@ -5,6 +5,8 @@ import com.purrComplexity.TrabajoYa.CalificacionTrabajador.dto.CalificacionTraba
 import com.purrComplexity.TrabajoYa.Contrato.ContratoService;
 import com.purrComplexity.TrabajoYa.Contrato.dto.ContratoDTO;
 import com.purrComplexity.TrabajoYa.Contrato.dto.CreateContratoDTO;
+import com.purrComplexity.TrabajoYa.Contrato.dto.UpdateContratoDTO;
+import com.purrComplexity.TrabajoYa.Empleador.dto.UpdateEmpleadorDTO;
 import com.purrComplexity.TrabajoYa.Empleo.Service.EmpleoService;
 import com.purrComplexity.TrabajoYa.Empleo.dto.EmpleoRequestDTO;
 import com.purrComplexity.TrabajoYa.Empleo.dto.EmpleoResponseDTO;
@@ -16,12 +18,15 @@ import com.purrComplexity.TrabajoYa.CalificacionTrabajador.Service.CalificacionT
 import com.purrComplexity.TrabajoYa.Empleador.Service.EmpleadorService;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorRequestDTO;
 import com.purrComplexity.TrabajoYa.Empleador.dto.EmpleadorResponseDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.TrabajadorRepository;
 import com.purrComplexity.TrabajoYa.Trabajador.TrabajadorServiceImpl;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.AceptadoDTO;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.CreateTrabajadorDTO;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
 import com.purrComplexity.TrabajoYa.Service.AplicationService;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.UpdateTrabajadorDTO;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
+import com.purrComplexity.TrabajoYa.User.dto.ProfileDTO;
 import com.purrComplexity.TrabajoYa.email.EmailEvent;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,13 +54,14 @@ public class AplicationController {
 
     private final EmpleadorService empleadorService;
     private final TrabajadorServiceImpl trabajadorServiceImpl;
-    private final EmpleoService empleoAService;
+    private final EmpleoService empleoService;
     private final ContratoService contratoService;
     private final CalificacionTrabajadorService calificacionTrabajadorService;
     private final CalificacionEmpresaService calificacionEmpresaService;
     private final ApplicationEventPublisher eventPublisher;
     private final AplicationService aplicationService;
     private final OfertaEmpleoService ofertaEmpleoService;
+    private final TrabajadorRepository trabajadorRepository;
 
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/empleador")
@@ -76,13 +82,13 @@ public class AplicationController {
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @PostMapping("/persona")
-    public ResponseEntity<TrabajadorDTO> postPersona(@RequestBody CreateTrabajadorDTO persona) {
+    @PostMapping("/trabajador")
+    public ResponseEntity<TrabajadorDTO> postTrabajador(@RequestBody CreateTrabajadorDTO trabajadorDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        TrabajadorDTO createTrabajadorDTO = trabajadorServiceImpl.createPersona(idUsuario, persona);
+        TrabajadorDTO createTrabajadorDTO = trabajadorServiceImpl.createPersona(idUsuario, trabajadorDTO);
 
         if (createTrabajadorDTO == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -99,13 +105,62 @@ public class AplicationController {
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @PostMapping("/crear/ofertaEmpleo/tipoA")
-    public ResponseEntity<EmpleoResponseDTO> crearEmpleoA(@RequestBody EmpleoRequestDTO empleoARequestDTO){
+    @DeleteMapping("/eliminar/empleador/{ruc}")
+    public ResponseEntity<String> deleteEmpleador(@PathVariable String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        EmpleoResponseDTO empleoAResponseDTO=empleoAService.crearYAsignarEmpleoA(empleoARequestDTO,idUsuario);
+        empleadorService.eliminarEmpleador(idUsuario,id);
+
+        return new ResponseEntity<>("Se borró la cuenta de empleador",HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @DeleteMapping("/eliminar/trabajador/{id}")
+    public ResponseEntity<String> deleteTrabajador(@PathVariable Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        trabajadorServiceImpl.deleteTrabajador(idUsuario,id);
+
+        return new ResponseEntity<>("Se borró la cuenta de Trabajador",HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @PatchMapping("/actualizar/trabajador/{id}")
+    public ResponseEntity<TrabajadorDTO> patchTrabajador(@PathVariable Long id, @RequestBody UpdateTrabajadorDTO updateTrabajadorDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        TrabajadorDTO trabajadorDTO=trabajadorServiceImpl.updateTrabajador(idUsuario,id,updateTrabajadorDTO);
+
+        return new ResponseEntity<>(trabajadorDTO,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @PatchMapping("/actualizar/empleador/{id}")
+    public ResponseEntity<EmpleadorResponseDTO> patchEmpleador(@PathVariable String id, @Valid @RequestBody UpdateEmpleadorDTO updateEmpleadorDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        EmpleadorResponseDTO empleadorResponseDTO=empleadorService.actualizarParcialmenteEmpleador(idUsuario,updateEmpleadorDTO,id);
+
+        return new ResponseEntity<>(empleadorResponseDTO,HttpStatus.OK);
+
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @PostMapping("/crear/ofertaEmpleo")
+    public ResponseEntity<EmpleoResponseDTO> postOfertaEmpleo(@RequestBody EmpleoRequestDTO empleoRequestDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        EmpleoResponseDTO empleoAResponseDTO=empleoService.crearYAsignarEmpleo(empleoRequestDTO,idUsuario);
 
         return new ResponseEntity<>(empleoAResponseDTO,HttpStatus.CREATED);
     }
@@ -134,15 +189,30 @@ public class AplicationController {
         return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
-    @PatchMapping("/actualizar/OfertaEmpleo/tipoA/{id}") //
-    public ResponseEntity<EmpleoResponseDTO> actualizarParcialmenteEmpleoA(@RequestBody EmpleoRequestDTO empleoARequestDTO, @PathVariable Long id){
-        EmpleoResponseDTO response = empleoAService.actualizarParcialmenteEmpleoA(id, empleoARequestDTO);
+    @PreAuthorize("hasRole('USUARIO')")
+    @PatchMapping("/actualizar/OfertaEmpleo/{id}") //
+    public ResponseEntity<EmpleoResponseDTO> patchOfertaEmpleo(@RequestBody EmpleoRequestDTO empleoRequestDTO, @PathVariable Long id){
+        EmpleoResponseDTO response = empleoService.actualizarParcialmenteEmpleo(id, empleoRequestDTO);
 
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
+    @DeleteMapping("/eliminar/OfertaEmpleo/{id}")
+    public ResponseEntity<String> deleteOfertaEmpleo(@PathVariable Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        empleoService.eliminarEmpleo(idUsuario,id);
+
+
+        return new ResponseEntity<>("Se elimino correctamente",HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/contrato/crearnuevo/{id_usuario}/{id_oferta_empleo}/{id_trabajador}")
-    public ResponseEntity<ContratoDTO> createContrato(
+    public ResponseEntity<ContratoDTO> postContrato(
             @Valid @RequestBody CreateContratoDTO createContratoDTO, @PathVariable Long id_usuario, @PathVariable Long id_trabajador,
             @PathVariable Long id_oferta_empleo) {
 
@@ -157,34 +227,39 @@ public class AplicationController {
         return ResponseEntity.created(location).body(contratoDTO);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/calificar/Trabajador/{idContrato}/{idPersona}")
-    public ResponseEntity<CalificacionTrabajadorResponseDTO> crearCalificacionPersona(@RequestBody CalificacionTrabajadorRequestDTO calificacionPersonaRequestDTO
+    public ResponseEntity<CalificacionTrabajadorResponseDTO> postCalificacionTrabajador(@RequestBody CalificacionTrabajadorRequestDTO calificacionPersonaRequestDTO
             , @PathVariable Long idContrato, @PathVariable Long idPersona){
         CalificacionTrabajadorResponseDTO calificacionPersonaResponseDTO = calificacionTrabajadorService.crearCalificacion(idContrato, idPersona, calificacionPersonaRequestDTO);
 
         return new ResponseEntity<>(calificacionPersonaResponseDTO,HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/calificar/Empresa/{idContrato}/{idPersona}")
-    public ResponseEntity<CalificacionEmpresaResponseDTO> crearCalificacionEmpleador(@RequestBody CalificacionEmpresaRequestDTO calificacionEmpresaRequestDTO
+    public ResponseEntity<CalificacionEmpresaResponseDTO> postCalificacionEmpleador(@RequestBody CalificacionEmpresaRequestDTO calificacionEmpresaRequestDTO
             , @PathVariable Long idContrato, @PathVariable String idPersona){
         CalificacionEmpresaResponseDTO calificacionEmpresaResponseDTO=calificacionEmpresaService.crearCalificacion(idContrato,idPersona,calificacionEmpresaRequestDTO);
 
         return new ResponseEntity<>(calificacionEmpresaResponseDTO,HttpStatus.CREATED);
     }
 
-    @GetMapping("/persona/{id}")
-    public ResponseEntity<TrabajadorDTO> getPersona(@PathVariable Long id) {
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/trabajador/{id}")
+    public ResponseEntity<TrabajadorDTO> getTrabajadorById(@PathVariable Long id) {
         TrabajadorDTO persona = trabajadorServiceImpl.getPersonaById(id);
         return ResponseEntity.ok(persona);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @GetMapping("/empleador/{ruc}")
-    public ResponseEntity<EmpleadorResponseDTO> getEmpleador(@PathVariable String ruc) {
+    public ResponseEntity<EmpleadorResponseDTO> getEmpleadorById(@PathVariable String ruc) {
         EmpleadorResponseDTO dto = empleadorService.obtenerEmpleadorPorId(ruc);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @GetMapping("/ofertas-empleo")
     public ResponseEntity<Page<OfertaEmpleoResponseDTO>> getOfertasEmpleoPaginadas(
             @PageableDefault(size = 10) Pageable pageable) {
@@ -215,6 +290,7 @@ public class AplicationController {
         return new ResponseEntity<>(ofertaEmpleos,HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @GetMapping("/mis/postulaciones")
     public ResponseEntity<List<OfertaEmpleoResponseDTO>> getPostulaciones(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -226,6 +302,7 @@ public class AplicationController {
         return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @GetMapping("/mis/postulantes/oferta/{id_ofertaEmpleo}")
     public ResponseEntity<List<TrabajadorDTO>> getPostulantesOferta(@PathVariable Long id_ofertaEmpleo){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -237,6 +314,7 @@ public class AplicationController {
         return new ResponseEntity<>(trabajadorDTOS,HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
     @GetMapping("/ofertas/cercanas/{radio_metros}")
     public ResponseEntity<List<OfertaEmpleoResponseDTO>> getOfertasCercanas(@PathVariable Double radio_metros){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -249,4 +327,17 @@ public class AplicationController {
 
     }
 
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("auth/profiles")
+    public ResponseEntity<ProfileDTO> getProfiles(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
+
+        ProfileDTO profileDTO=aplicationService.getProfile(idUsuario);
+
+        return new ResponseEntity<>(profileDTO,HttpStatus.OK);
+
+
+    }
 }

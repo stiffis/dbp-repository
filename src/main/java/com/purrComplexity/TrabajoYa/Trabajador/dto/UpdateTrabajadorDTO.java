@@ -6,7 +6,8 @@ import java.util.Date;
 
 @Data
 public class UpdateTrabajadorDTO {
-    private String ubicacion;
+    private Double latitud;
+    private Double longitud;
     
     @Email(message = "El formato del correo no es válido")
     private String correo;

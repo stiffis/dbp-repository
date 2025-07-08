@@ -11,9 +11,12 @@ import com.purrComplexity.TrabajoYa.Trabajador.dto.AceptadoDTO;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
 import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
+import com.purrComplexity.TrabajoYa.User.dto.ProfileDTO;
 import com.purrComplexity.TrabajoYa.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -225,4 +228,46 @@ public class AplicationService {
                 .collect(Collectors.toList());
     }
 
+    public ProfileDTO getProfile(Long userID){
+        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()-> new UsernameNotFoundException("No se encontró al usuario"));
+
+        ProfileDTO profileDTO=new ProfileDTO();
+
+        if (userAccount.getIsEmpresario() && userAccount.getIsTrabajador()){
+            profileDTO.setHasEmpleadorProfile(true);
+            profileDTO.setHasTrabajadorProfile(true);
+            profileDTO.setEmpleadorRuc(userAccount.getEmpresario().getRuc());
+            profileDTO.setEmpleadorRazonSocial(userAccount.getEmpresario().getRazonSocial());
+            profileDTO.setTrabajadorId(userAccount.getTrabajador().getId());
+            profileDTO.setTrabajadorNombres(userAccount.getTrabajador().getNombresCompletos());
+            return profileDTO;
+        }
+
+        else{
+            if (userAccount.getIsTrabajador()){
+                profileDTO.setHasTrabajadorProfile(true);
+                profileDTO.setHasEmpleadorProfile(false);
+                profileDTO.setTrabajadorId(userAccount.getTrabajador().getId());
+                profileDTO.setTrabajadorNombres(userAccount.getTrabajador().getNombresCompletos());
+
+                return profileDTO;
+            }
+
+            if(userAccount.getIsEmpresario()){
+                profileDTO.setHasEmpleadorProfile(true);
+                profileDTO.setHasTrabajadorProfile(false);
+                profileDTO.setEmpleadorRuc(userAccount.getEmpresario().getRuc());
+                profileDTO.setEmpleadorRazonSocial(userAccount.getEmpresario().getRazonSocial());
+
+                return profileDTO;
+            }
+
+            profileDTO.setHasEmpleadorProfile(false);
+            profileDTO.setHasTrabajadorProfile(false);
+
+        }
+
+        return profileDTO;
+
+    }
 }

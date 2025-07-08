@@ -126,4 +126,16 @@ public class GlobalExceptionHandler {
         ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
+
+    @ExceptionHandler(EmpleadorNoPerteneceAlUsuarioException.class)
+    public ResponseEntity<?> handleEmpleadorNoPerteneceAlUsuarioException(EmpleadorNoPerteneceAlUsuarioException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(TrabajadorNoPerteneceAlUsuarioException.class)
+    public ResponseEntity<?> handleTrabajadorNoPerteneceAlUsuarioException(TrabajadorNoPerteneceAlUsuarioException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
 }

@@ -6,14 +6,13 @@ import com.purrComplexity.TrabajoYa.Empleo.Repository.EmpleoARepository;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.CreateTrabajadorDTO;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorPostulaDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.UpdateTrabajadorDTO;
 import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
-import com.purrComplexity.TrabajoYa.exception.OfertaEmpleoNotFound;
-import com.purrComplexity.TrabajoYa.exception.TrabajadorNotFound;
-import com.purrComplexity.TrabajoYa.exception.TrabajadorWithSameCorreo;
-import com.purrComplexity.TrabajoYa.exception.UsuarioYaEsTrabajadorException;
+import com.purrComplexity.TrabajoYa.exception.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -68,27 +67,48 @@ public class TrabajadorServiceImpl implements TrabajadorService {
     }
     
     @Override
-    public Trabajador updatePersona(Long id, Trabajador trabajadorDetails) {
+    public TrabajadorDTO updateTrabajador(Long idUsuario,Long id, UpdateTrabajadorDTO trabajadorDetails) {
+        ModelMapper mapper=new ModelMapper();
+        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
+        if (!userAccount.getIsTrabajador()){
+            throw new UsuarioNoEsTrabajadorException();
+        }
+
         Trabajador trabajador = trabajadorRepository.findById(id).orElseThrow(
                 TrabajadorNotFound::new
         );
 
-        trabajador.setNombresCompletos(trabajadorDetails.getNombresCompletos());
-        trabajador.setCorreo(trabajadorDetails.getCorreo());
-        trabajador.setLatitud(trabajadorDetails.getLatitud());
-        trabajador.setLongitud(trabajador.getLongitud());
-        trabajador.setFechaNacimiento(trabajadorDetails.getFechaNacimiento());
-        trabajador.setHabilidades(trabajadorDetails.getHabilidades());
-        trabajador.setDni(trabajadorDetails.getDni());
-        return trabajadorRepository.save(trabajador);
+        if (!userAccount.getTrabajador().getId().equals(trabajador.getId())){
+            throw new TrabajadorNoPerteneceAlUsuarioException();
+        }
+
+        mapper.map(trabajadorDetails,trabajador);
+
+        Trabajador savedTrabajador=trabajadorRepository.save(trabajador);
+
+        TrabajadorDTO trabajadorDTO=modelMapper.map(savedTrabajador,TrabajadorDTO.class);
+
+        return trabajadorDTO;
     }
     
     @Override
-    public void deletePersona(Long id) {
-        Trabajador persona = trabajadorRepository.findById(id).orElseThrow(
+    public void deleteTrabajador(Long userId ,Long id) {
+        UserAccount userAccount=userAccountRepository.findById(userId).orElseThrow(()->new UsernameNotFoundException("El usuario no existe"));
+        if (!userAccount.getIsTrabajador()){
+            throw new UsuarioNoEsTrabajadorException();
+        }
+
+        Trabajador trabajador = trabajadorRepository.findById(id).orElseThrow(
                 TrabajadorNotFound::new
         );
-        trabajadorRepository.delete(persona);
+
+        if (!userAccount.getTrabajador().getId().equals(trabajador.getId())){
+            throw new TrabajadorNoPerteneceAlUsuarioException();
+        }
+
+        trabajadorRepository.delete(trabajador);
     }
     
     @Override

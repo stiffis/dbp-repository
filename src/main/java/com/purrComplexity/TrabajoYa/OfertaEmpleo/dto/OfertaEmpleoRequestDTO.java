@@ -14,12 +14,11 @@ import java.time.LocalDateTime;
 public class OfertaEmpleoRequestDTO {
 
     private String periodoPago;
+
     private Long montoPorPeriodo;
 
     @Enumerated(EnumType.STRING)
     private modalidad modalidadEmpleo;
-
-    private String lugar;
 
     private String habilidades;
 
@@ -36,4 +35,8 @@ public class OfertaEmpleoRequestDTO {
     private String hoursPerDay;
 
     private WeekDays weekDays;
+
+    private Double latitud;
+
+    private Double longitud;
 }
