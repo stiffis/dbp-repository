@@ -13,13 +13,16 @@ import java.time.LocalDateTime;
 @Data
 public class OfertaEmpleoResponseDTO {
 
+    private Long idOfertaEmpleo;
     private String periodoPago;
     private Long montoPorPeriodo;
 
     @Enumerated(EnumType.STRING)
     private modalidad modalidadEmpleo; // VIRTUAL, PRESENCIAL, HIBRIDO
 
-    private String lugar;
+    private Double latitud;
+
+    private Double longitud;
 
     private String habilidades;
 

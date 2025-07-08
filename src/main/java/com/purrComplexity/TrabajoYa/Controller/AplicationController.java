@@ -6,6 +6,7 @@ import com.purrComplexity.TrabajoYa.Contrato.ContratoService;
 import com.purrComplexity.TrabajoYa.Contrato.dto.ContratoDTO;
 import com.purrComplexity.TrabajoYa.Contrato.dto.CreateContratoDTO;
 import com.purrComplexity.TrabajoYa.Contrato.dto.UpdateContratoDTO;
+import com.purrComplexity.TrabajoYa.Empleador.Empleador;
 import com.purrComplexity.TrabajoYa.Empleador.dto.UpdateEmpleadorDTO;
 import com.purrComplexity.TrabajoYa.Empleo.Service.EmpleoService;
 import com.purrComplexity.TrabajoYa.Empleo.dto.EmpleoRequestDTO;
@@ -176,7 +177,7 @@ public class AplicationController {
 
         return new ResponseEntity<>(aceptadoDTO,HttpStatus.OK);
     }
-
+    
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/empleador/rechazar/{id_postulante}/{id_empleo}")
     public ResponseEntity<String> rechazarEmpleador(@PathVariable Long id_empleo,@PathVariable Long id_postulante){
@@ -268,6 +269,22 @@ public class AplicationController {
     }
 
     @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/ofertasEmpleo")
+    public ResponseEntity<List<OfertaEmpleoResponseDTO>> getTodasOfertasEmpleo(){
+        List<OfertaEmpleoResponseDTO> ofertaEmpleoResponseDTOS=ofertaEmpleoService.obtenerTodasOfertaEmpleo();
+
+        return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/empleadores")
+    public ResponseEntity<List<EmpleadorResponseDTO>> getTodosEmpleadorees(){
+        List<EmpleadorResponseDTO> empleadorResponseDTOS=empleadorService.obtenerTodosEmpleador();
+
+        return new ResponseEntity<>(empleadorResponseDTOS,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/postular/{idOfertaEmpleo}")
     public ResponseEntity<String> postular(@PathVariable Long idOfertaEmpleo) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -280,14 +297,14 @@ public class AplicationController {
 
     @PreAuthorize("hasRole('USUARIO')")
     @GetMapping("/mis/ofertasEmpleos")
-    public ResponseEntity<List<OfertaEmpleo>> getEmpleos(){
+    public ResponseEntity<List<OfertaEmpleoResponseDTO>> getEmpleos(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
         Long idUsuario = detallesUser.getId();
 
-        List<OfertaEmpleo> ofertaEmpleos=aplicationService.obtenerEmpleos(idUsuario);
+        List<OfertaEmpleoResponseDTO> ofertaEmpleoResponseDTOS=aplicationService.obtenerEmpleos(idUsuario);
 
-        return new ResponseEntity<>(ofertaEmpleos,HttpStatus.OK);
+        return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('USUARIO')")
@@ -300,6 +317,30 @@ public class AplicationController {
         List<OfertaEmpleoResponseDTO> ofertaEmpleoResponseDTOS=aplicationService.obtenerPostulaciones(idUsuario);
 
         return new ResponseEntity<>(ofertaEmpleoResponseDTOS,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/postulantes/ofertaEmpleo/{id}")
+    public ResponseEntity<List<TrabajadorDTO>> getPostulantesOfertaEmpleo(@PathVariable Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
+
+        List<TrabajadorDTO> trabajadorDTOS=ofertaEmpleoService.obtenerPosultantesOfertaEmpleo(idUsuario,id);
+
+        return new ResponseEntity<>(trabajadorDTOS,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/aceptados/ofertaEmpleo/{id}")
+    public ResponseEntity<List<TrabajadorDTO>> getContratadosOfertaEmpleo(@PathVariable Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount detallesUser = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = detallesUser.getId();
+
+        List<TrabajadorDTO> trabajadorDTOS=ofertaEmpleoService.obtenerContratadosOfertaEmpleo(idUsuario,id);
+
+        return new ResponseEntity<>(trabajadorDTOS,HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('USUARIO')")
@@ -340,4 +381,5 @@ public class AplicationController {
 
 
     }
+
 }

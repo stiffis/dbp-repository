@@ -132,19 +132,21 @@ public class AplicationService {
         return "Postulación exitosa para la oferta de empleo: " + ofertaEmpleo.getIdOfertaEmpleo();
     }
 
-    public List<OfertaEmpleo> obtenerEmpleos(Long userID){
-        UserAccount userAccount=userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
-
+    public List<OfertaEmpleoResponseDTO> obtenerEmpleos(Long userID) {
+        UserAccount userAccount = userAccountRepository.findById(userID)
+                .orElseThrow(() -> new UsernameNotFoundException("No existe el usuario"));
 
         if (!userAccount.getIsEmpresario()) {
             return Collections.emptyList();
         }
 
-        Empleador empleador=userAccount.getEmpresario();
+        Empleador empleador = userAccount.getEmpresario();
 
-        return empleador.getOfertas();
-
+        return empleador.getOfertas().stream()
+                .map(oferta -> modelMapper.map(oferta, OfertaEmpleoResponseDTO.class))
+                .collect(Collectors.toList());
     }
+
 
     public List<OfertaEmpleoResponseDTO> obtenerPostulaciones(Long userID){
         UserAccount userAccount= userAccountRepository.findById(userID).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));

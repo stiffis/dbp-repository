@@ -5,6 +5,7 @@ import java.util.Date;
 
 @Data
 public class TrabajadorDTO {
+    private Double id;
     private Double latitud;
     private Double longitud;
 

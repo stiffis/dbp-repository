@@ -1,14 +1,23 @@
 package com.purrComplexity.TrabajoYa.OfertaEmpleo.Service;
 
+import com.purrComplexity.TrabajoYa.Empleo.Empleo;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.Repository.OfertaEmpleoRepository;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.dto.OfertaEmpleoRequestDTO;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.dto.OfertaEmpleoResponseDTO;
+import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
+import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
+import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
+import com.purrComplexity.TrabajoYa.exception.OfertaEmpleoNoPerteneceAlEmpleadorException;
+import com.purrComplexity.TrabajoYa.exception.OfertaEmpleoNotFound;
+import com.purrComplexity.TrabajoYa.exception.UsuarioNoEsEmpleadorException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +28,7 @@ import java.util.List;
 public class OfertaEmpleoService {
     private final OfertaEmpleoRepository ofertaEmpleoRepository;
     private final ModelMapper modelMapper;
+    private final UserAccountRepository userAccountRepository;
 
     public OfertaEmpleoResponseDTO publicarOfertaEmpleo(OfertaEmpleoRequestDTO ofertaEmpleoRequestDTO) {
         OfertaEmpleo ofertaEmpleo = modelMapper.map(ofertaEmpleoRequestDTO, OfertaEmpleo.class);
@@ -93,6 +103,56 @@ public class OfertaEmpleoService {
     public Page<OfertaEmpleoResponseDTO> obtenerOfertasEmpleoPaginadas(Pageable pageable) {
         Page<OfertaEmpleo> page = ofertaEmpleoRepository.findAll(pageable);
         return page.map(oferta -> modelMapper.map(oferta, OfertaEmpleoResponseDTO.class));
+    }
+
+    public List<TrabajadorDTO> obtenerPosultantesOfertaEmpleo(Long userId, Long id){
+        UserAccount userAccount=userAccountRepository.findById(userId).orElseThrow(()-> new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
+
+        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(id).orElseThrow(OfertaEmpleoNotFound::new);
+
+        if (!userAccount.getEmpresario().getRuc().equals(ofertaEmpleo.getEmpleador().getRuc())){
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
+        }
+
+        List<Trabajador> trabajadors=ofertaEmpleo.getPostulantes();
+
+        List<TrabajadorDTO> trabajadorDTOS=new ArrayList<>();
+
+        for (Trabajador trabajador : trabajadors) {
+            TrabajadorDTO dto = modelMapper.map(trabajador, TrabajadorDTO.class);
+            trabajadorDTOS.add(dto);
+        }
+
+        return trabajadorDTOS;
+    }
+
+    public List<TrabajadorDTO> obtenerContratadosOfertaEmpleo(Long userId, Long id){
+        UserAccount userAccount=userAccountRepository.findById(userId).orElseThrow(()-> new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
+
+        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(id).orElseThrow(OfertaEmpleoNotFound::new);
+
+        if (!userAccount.getEmpresario().getRuc().equals(ofertaEmpleo.getEmpleador().getRuc())){
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
+        }
+
+        List<Trabajador> trabajadors=ofertaEmpleo.getContratados();
+
+        List<TrabajadorDTO> trabajadorDTOS=new ArrayList<>();
+
+        for (Trabajador trabajador : trabajadors) {
+            TrabajadorDTO dto = modelMapper.map(trabajador, TrabajadorDTO.class);
+            trabajadorDTOS.add(dto);
+        }
+
+        return trabajadorDTOS;
     }
 
 }
