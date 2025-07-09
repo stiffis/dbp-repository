@@ -4,15 +4,20 @@ import com.purrComplexity.TrabajoYa.CalificacionEmpresa.CalificacionEmpresa;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.CalificacionEmpresaRepository;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.dto.CalificacionEmpresaRequestDTO;
 import com.purrComplexity.TrabajoYa.CalificacionEmpresa.dto.CalificacionEmpresaResponseDTO;
+import com.purrComplexity.TrabajoYa.CalificacionTrabajador.CalificacionTrabajador;
 import com.purrComplexity.TrabajoYa.Contrato.Contrato;
 import com.purrComplexity.TrabajoYa.Contrato.ContratoRepository;
 import com.purrComplexity.TrabajoYa.Empleador.Empleador;
 import com.purrComplexity.TrabajoYa.Empleador.Repository.EmpleadorRepository;
+import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
+import com.purrComplexity.TrabajoYa.User.UserAccount;
 import com.purrComplexity.TrabajoYa.exception.TrabajadorNotFound;
 import com.purrComplexity.TrabajoYa.exception.ContratoNotFound;
 import com.purrComplexity.TrabajoYa.exception.ContratoNotInEmpleador;
+import com.purrComplexity.TrabajoYa.exception.UsuarioNoEsEmpleadorException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,12 +27,18 @@ public class CalificacionEmpresaService {
     private final ModelMapper modelMapper;
     private final EmpleadorRepository empleadorRepository;
     private final ContratoRepository contratoRepository;
+    private final UserAccountRepository userAccountRepository;
 
-    public CalificacionEmpresaResponseDTO crearCalificacion(Long idContrato, String idEmpresa,
+    public CalificacionEmpresaResponseDTO crearCalificacionEmpleador(Long idContrato, Long idUsuaro,
                                                             CalificacionEmpresaRequestDTO calificacionEmpresaRequestDTO){
-        Empleador empleador=empleadorRepository.findById(idEmpresa).orElseThrow(
-                TrabajadorNotFound::new
-        );
+
+        UserAccount userAccount=userAccountRepository.findById(idUsuaro).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
+
+        Empleador empleador=userAccount.getEmpresario();
 
         Contrato contrato=contratoRepository.findById(idContrato).orElseThrow(
                 ContratoNotFound::new
@@ -37,13 +48,29 @@ public class CalificacionEmpresaService {
             throw new ContratoNotInEmpleador();
         }
 
-        CalificacionEmpresa calificacionEmpresa=modelMapper.map(calificacionEmpresaRequestDTO,CalificacionEmpresa.class);
+        CalificacionEmpresa calificacionEmpresa=new CalificacionEmpresa();
 
-        calificacionEmpresa=calificacionEmpresaRepository.save(calificacionEmpresa);
+        calificacionEmpresa.setPuntuacionEmpresa(calificacionEmpresaRequestDTO.getPuntuacionEmpresa());
 
-        CalificacionEmpresaResponseDTO calificacionEmpresaResponseDTO=modelMapper.map(calificacionEmpresa,CalificacionEmpresaResponseDTO.class);
+        CalificacionEmpresa calificacionEmpresa1=calificacionEmpresaRepository.save(calificacionEmpresa);
 
-        calificacionEmpresaResponseDTO.setContratoId(contrato.getId());
+        contrato.setCalificacionEmpresa(calificacionEmpresa1);
+
+        CalificacionTrabajador calificacionTrabajador = contrato.getCalificacionTrabajador();
+        Double pt = calificacionEmpresa1.getPuntuacionEmpresa();
+
+        if (calificacionTrabajador == null) {
+            contrato.setCalificacionPromedio(pt);
+        } else {
+            contrato.setCalificacionPromedio((pt + calificacionTrabajador.getPuntuacionTrabajador()) / 2.0);
+        }
+
+        Contrato savedContrato=contratoRepository.save(contrato);
+
+        CalificacionEmpresaResponseDTO calificacionEmpresaResponseDTO=new CalificacionEmpresaResponseDTO();
+
+        calificacionEmpresaResponseDTO.setPuntuacionContrato(savedContrato.getCalificacionPromedio());
+
 
         return calificacionEmpresaResponseDTO;
 

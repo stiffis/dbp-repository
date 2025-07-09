@@ -54,9 +54,14 @@ public class TrabajadorServiceImpl implements TrabajadorService {
     }
 
     @Override
-    public TrabajadorDTO getPersonaById(Long id) {
-        Trabajador trabajador = trabajadorRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Persona no encontrada con id: " + id));
+    public TrabajadorDTO getTrabajador(Long idUsuario) {
+        UserAccount userAccount = userAccountRepository.findById(idUsuario).orElseThrow(() -> new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsTrabajador()){
+            throw new UsuarioNoEsTrabajadorException();
+        }
+
+        Trabajador trabajador = userAccount.getTrabajador();
 
         return modelMapper.map(trabajador, TrabajadorDTO.class);
     }
@@ -67,7 +72,7 @@ public class TrabajadorServiceImpl implements TrabajadorService {
     }
     
     @Override
-    public TrabajadorDTO updateTrabajador(Long idUsuario,Long id, UpdateTrabajadorDTO trabajadorDetails) {
+    public TrabajadorDTO updateTrabajador(Long idUsuario, UpdateTrabajadorDTO trabajadorDetails) {
         ModelMapper mapper=new ModelMapper();
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
@@ -76,13 +81,7 @@ public class TrabajadorServiceImpl implements TrabajadorService {
             throw new UsuarioNoEsTrabajadorException();
         }
 
-        Trabajador trabajador = trabajadorRepository.findById(id).orElseThrow(
-                TrabajadorNotFound::new
-        );
-
-        if (!userAccount.getTrabajador().getId().equals(trabajador.getId())){
-            throw new TrabajadorNoPerteneceAlUsuarioException();
-        }
+        Trabajador trabajador = userAccount.getTrabajador();
 
         mapper.map(trabajadorDetails,trabajador);
 

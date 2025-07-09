@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.URL;
 import java.time.LocalDateTime;
 
 @Data
-public class OfertaEmpleoResponseDTO {
+public class    OfertaEmpleoResponseDTO {
 
     private Long idOfertaEmpleo;
     private String periodoPago;
@@ -39,6 +39,5 @@ public class OfertaEmpleoResponseDTO {
     private String hoursPerDay;
 
     private WeekDays weekDays;
-
 
 }

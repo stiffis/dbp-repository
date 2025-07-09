@@ -81,7 +81,7 @@ public class EmpleadorService {
         return empleadorResponseDTO;
     }
 
-    public EmpleadorResponseDTO actualizarParcialmenteEmpleador(Long userID,UpdateEmpleadorDTO updateEmpleadorDTO, String id){
+    public EmpleadorResponseDTO actualizarParcialmenteEmpleador(Long userID,UpdateEmpleadorDTO updateEmpleadorDTO){
         ModelMapper mapper=new ModelMapper();
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
@@ -91,13 +91,8 @@ public class EmpleadorService {
             throw new UsuarioNoEsEmpleadorException();
         }
 
-        Empleador empleador=
-                empleadorRepository.findById(id).orElseThrow(EmpleadorNotFound::new);
+        Empleador empleador=userAccount.getEmpresario();
 
-
-        if (!userAccount.getEmpresario().getRuc().equals(empleador.getRuc())){
-            throw new EmpleadorNoPerteneceAlUsuarioException();
-        }
 
         mapper.map(updateEmpleadorDTO,empleador);
 
@@ -108,9 +103,15 @@ public class EmpleadorService {
         return empleadorResponseDTO;
     }
 
-    public EmpleadorResponseDTO obtenerEmpleadorPorId(String id){
-        Empleador empleador=
-                empleadorRepository.findById(id).orElseThrow(EmpleadorNotFound::new);
+    public EmpleadorResponseDTO obtenerEmpleador(Long idUsuario){
+
+        UserAccount userAccount=userAccountRepository.findById(idUsuario).orElseThrow(()->new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
+
+        Empleador empleador= userAccount.getEmpresario();
 
         EmpleadorResponseDTO empleadorResponseDTO=modelMapper.map(empleador,EmpleadorResponseDTO.class);
 

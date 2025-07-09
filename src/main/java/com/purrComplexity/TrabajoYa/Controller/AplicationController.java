@@ -26,7 +26,9 @@ import com.purrComplexity.TrabajoYa.Trabajador.dto.CreateTrabajadorDTO;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.TrabajadorDTO;
 import com.purrComplexity.TrabajoYa.Service.AplicationService;
 import com.purrComplexity.TrabajoYa.Trabajador.dto.UpdateTrabajadorDTO;
+import com.purrComplexity.TrabajoYa.User.Repository.UserAccountRepository;
 import com.purrComplexity.TrabajoYa.User.UserAccount;
+import com.purrComplexity.TrabajoYa.User.UserAccountService;
 import com.purrComplexity.TrabajoYa.User.dto.ProfileDTO;
 import com.purrComplexity.TrabajoYa.email.EmailEvent;
 import jakarta.validation.Valid;
@@ -62,7 +64,20 @@ public class AplicationController {
     private final ApplicationEventPublisher eventPublisher;
     private final AplicationService aplicationService;
     private final OfertaEmpleoService ofertaEmpleoService;
-    private final TrabajadorRepository trabajadorRepository;
+    private final UserAccountService userAccountService;
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/me/nombre")
+    public ResponseEntity<String> getNombreUsuario(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        String nombre= userAccountService.getNombre(idUsuario);
+
+        return new ResponseEntity<>(nombre,HttpStatus.OK);
+
+    }
 
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/empleador")
@@ -130,25 +145,25 @@ public class AplicationController {
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @PatchMapping("/actualizar/trabajador/{id}")
-    public ResponseEntity<TrabajadorDTO> patchTrabajador(@PathVariable Long id, @RequestBody UpdateTrabajadorDTO updateTrabajadorDTO){
+    @PatchMapping("/actualizar/trabajador")
+    public ResponseEntity<TrabajadorDTO> patchTrabajador(@RequestBody UpdateTrabajadorDTO updateTrabajadorDTO){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        TrabajadorDTO trabajadorDTO=trabajadorServiceImpl.updateTrabajador(idUsuario,id,updateTrabajadorDTO);
+        TrabajadorDTO trabajadorDTO=trabajadorServiceImpl.updateTrabajador(idUsuario,updateTrabajadorDTO);
 
         return new ResponseEntity<>(trabajadorDTO,HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @PatchMapping("/actualizar/empleador/{id}")
-    public ResponseEntity<EmpleadorResponseDTO> patchEmpleador(@PathVariable String id, @Valid @RequestBody UpdateEmpleadorDTO updateEmpleadorDTO){
+    @PatchMapping("/actualizar/empleador/")
+    public ResponseEntity<EmpleadorResponseDTO> patchEmpleador( @Valid @RequestBody UpdateEmpleadorDTO updateEmpleadorDTO){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userDetails = (UserAccount) authentication.getPrincipal();
         Long idUsuario = userDetails.getId();
 
-        EmpleadorResponseDTO empleadorResponseDTO=empleadorService.actualizarParcialmenteEmpleador(idUsuario,updateEmpleadorDTO,id);
+        EmpleadorResponseDTO empleadorResponseDTO=empleadorService.actualizarParcialmenteEmpleador(idUsuario,updateEmpleadorDTO);
 
         return new ResponseEntity<>(empleadorResponseDTO,HttpStatus.OK);
 
@@ -212,12 +227,16 @@ public class AplicationController {
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @PostMapping("/contrato/crearnuevo/{id_usuario}/{id_oferta_empleo}/{id_trabajador}")
+    @PostMapping("/contrato/crearnuevo/{id_oferta_empleo}/{id_trabajador}")
     public ResponseEntity<ContratoDTO> postContrato(
-            @Valid @RequestBody CreateContratoDTO createContratoDTO, @PathVariable Long id_usuario, @PathVariable Long id_trabajador,
+             @PathVariable Long id_trabajador,
             @PathVariable Long id_oferta_empleo) {
 
-        ContratoDTO contratoDTO = contratoService.createContrato(id_usuario,id_oferta_empleo,id_trabajador,createContratoDTO);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        ContratoDTO contratoDTO = contratoService.createContrato(idUsuario,id_oferta_empleo,id_trabajador);
 
     URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -229,34 +248,74 @@ public class AplicationController {
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @PostMapping("/calificar/Trabajador/{idContrato}/{idPersona}")
+    @PostMapping("/calificar/Trabajador/{idContrato}")
     public ResponseEntity<CalificacionTrabajadorResponseDTO> postCalificacionTrabajador(@RequestBody CalificacionTrabajadorRequestDTO calificacionPersonaRequestDTO
-            , @PathVariable Long idContrato, @PathVariable Long idPersona){
-        CalificacionTrabajadorResponseDTO calificacionPersonaResponseDTO = calificacionTrabajadorService.crearCalificacion(idContrato, idPersona, calificacionPersonaRequestDTO);
+            , @PathVariable Long idContrato){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        CalificacionTrabajadorResponseDTO calificacionPersonaResponseDTO = calificacionTrabajadorService.crearCalificacionTrabajador(idContrato, idUsuario, calificacionPersonaRequestDTO);
 
         return new ResponseEntity<>(calificacionPersonaResponseDTO,HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @PostMapping("/calificar/Empresa/{idContrato}/{idPersona}")
+    @PostMapping("/calificar/Empresa/{idContrato}")
     public ResponseEntity<CalificacionEmpresaResponseDTO> postCalificacionEmpleador(@RequestBody CalificacionEmpresaRequestDTO calificacionEmpresaRequestDTO
-            , @PathVariable Long idContrato, @PathVariable String idPersona){
-        CalificacionEmpresaResponseDTO calificacionEmpresaResponseDTO=calificacionEmpresaService.crearCalificacion(idContrato,idPersona,calificacionEmpresaRequestDTO);
+            , @PathVariable Long idContrato){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        CalificacionEmpresaResponseDTO calificacionEmpresaResponseDTO=calificacionEmpresaService.crearCalificacionEmpleador(idContrato,idUsuario,calificacionEmpresaRequestDTO);
 
         return new ResponseEntity<>(calificacionEmpresaResponseDTO,HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @GetMapping("/trabajador/{id}")
-    public ResponseEntity<TrabajadorDTO> getTrabajadorById(@PathVariable Long id) {
-        TrabajadorDTO persona = trabajadorServiceImpl.getPersonaById(id);
+    @GetMapping("/mis/contratos")
+    public ResponseEntity<List<ContratoDTO>> getContratosTrabajador(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        List<ContratoDTO> contratoDTOS=contratoService.getAllContratos(idUsuario);
+
+        return new ResponseEntity<>(contratoDTOS,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("contratos/ofertaEmpleo/{id_OfertaEmpleo}")
+    public ResponseEntity<List<ContratoDTO>> getContratosOfertaEmpleo(@PathVariable Long id_OfertaEmpleo){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        List<ContratoDTO> contratoDTOS=ofertaEmpleoService.obtenerContratosOfertaEmpleo(idUsuario,id_OfertaEmpleo);
+
+        return new ResponseEntity<>(contratoDTOS,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @GetMapping("/trabajador")
+    public ResponseEntity<TrabajadorDTO> getTrabajador() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        TrabajadorDTO persona = trabajadorServiceImpl.getTrabajador(idUsuario);
         return ResponseEntity.ok(persona);
     }
 
     @PreAuthorize("hasRole('USUARIO')")
-    @GetMapping("/empleador/{ruc}")
-    public ResponseEntity<EmpleadorResponseDTO> getEmpleadorById(@PathVariable String ruc) {
-        EmpleadorResponseDTO dto = empleadorService.obtenerEmpleadorPorId(ruc);
+    @GetMapping("/empleador")
+    public ResponseEntity<EmpleadorResponseDTO> getEmpleador() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount userDetails = (UserAccount) authentication.getPrincipal();
+        Long idUsuario = userDetails.getId();
+
+        EmpleadorResponseDTO dto = empleadorService.obtenerEmpleador(idUsuario);
         return ResponseEntity.ok(dto);
     }
 

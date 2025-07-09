@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class EmpleadorResponseDTO {
     private String ruc;
-    private String RazonSocial;
-    private Long TelefonoPrincipal;
+    private String razonSocial;
+    private Long telefonoPrincipal;
     @Email
-    private String Correo;
+    private String correo;
 }

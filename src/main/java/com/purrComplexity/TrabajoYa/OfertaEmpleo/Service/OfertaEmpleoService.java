@@ -1,5 +1,7 @@
 package com.purrComplexity.TrabajoYa.OfertaEmpleo.Service;
 
+import com.purrComplexity.TrabajoYa.Contrato.Contrato;
+import com.purrComplexity.TrabajoYa.Contrato.dto.ContratoDTO;
 import com.purrComplexity.TrabajoYa.Empleo.Empleo;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.OfertaEmpleo.Repository.OfertaEmpleoRepository;
@@ -153,6 +155,38 @@ public class OfertaEmpleoService {
         }
 
         return trabajadorDTOS;
+    }
+
+    public List<ContratoDTO> obtenerContratosOfertaEmpleo(Long userId, Long idOferta){
+        UserAccount userAccount=userAccountRepository.findById(userId).orElseThrow(()-> new UsernameNotFoundException("No existe el usuario"));
+
+        if (!userAccount.getIsEmpresario()){
+            throw new UsuarioNoEsEmpleadorException();
+        }
+
+        OfertaEmpleo ofertaEmpleo=ofertaEmpleoRepository.findById(idOferta).orElseThrow(OfertaEmpleoNotFound::new);
+
+        if (!ofertaEmpleo.getEmpleador().getRuc().equals(userAccount.getEmpresario().getRuc())){
+            throw new OfertaEmpleoNoPerteneceAlEmpleadorException();
+        }
+
+        List<Contrato> contratos=ofertaEmpleo.getContratos();
+
+        List<ContratoDTO> contratoDTOS=new ArrayList<>();
+
+        for (Contrato a:contratos){
+            ContratoDTO contratoDTO=new ContratoDTO();
+            contratoDTO.setId(a.getId());
+            contratoDTO.setFechaCreacion(a.getFechaCreacion());
+            contratoDTO.setOfertaEmpleoId(a.getOfertaEmpleo().getIdOfertaEmpleo());
+            contratoDTO.setPersonaContratadaId(a.getTrabajadorContratado().getId());
+            contratoDTO.setPromedioCalificaciones(a.getCalificacionPromedio());
+
+            contratoDTOS.add(contratoDTO);
+        }
+
+        return contratoDTOS;
+
     }
 
 }

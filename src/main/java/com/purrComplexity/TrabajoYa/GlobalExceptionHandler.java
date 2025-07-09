@@ -138,4 +138,10 @@ public class GlobalExceptionHandler {
         ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
+
+    @ExceptionHandler(TrabajadorNoContratadoException.class)
+    public ResponseEntity<?> habldeTrabajadorNoContratadoException(TrabajadorNoContratadoException ex){
+        ErrorMessage errorMessage=new ErrorMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
 }

@@ -26,7 +26,5 @@ public class CreateContratoDTO {
         @PastOrPresent(message = "La fecha de creación no puede ser futura")
         private Date fechaCreacion;
 
-        @Valid
-        private List<@Min(1) @Max(5) Integer> calificaciones;
 
 }

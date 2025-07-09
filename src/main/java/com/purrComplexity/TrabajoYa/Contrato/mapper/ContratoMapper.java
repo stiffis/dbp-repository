@@ -28,28 +28,7 @@ public class ContratoMapper {
 
         return dto;
     }
-    
-    public Contrato toEntity(CreateContratoDTO dto, Trabajador trabajador, OfertaEmpleo ofertaEmpleo) {
-        Contrato contrato = new Contrato(); // estoy ya crea todos los campos de un contrato, pero estan vacios inicialmente
-        contrato.setFechaCreacion(dto.getFechaCreacion());
-        contrato.setTrabajadorContratado(trabajador);
-        contrato.setOfertaEmpleo(ofertaEmpleo);
 
-        // Calcular promedio
-        List<Integer> calificaciones = dto.getCalificaciones();
-        if (calificaciones != null && !calificaciones.isEmpty()) {
-            double promedio = calificaciones.stream()
-                    .mapToInt(Integer::intValue)
-                    .average()
-                    .orElse(0.0);
-            contrato.setCalificacionPromedio(promedio);
-        } else {
-            contrato.setCalificacionPromedio(null);
-        }
-
-        return contrato;
-    }
-    
     public void updateEntityFromDTO(UpdateContratoDTO dto, Contrato contrato, Trabajador trabajador) {
         if (dto.getFechaCreacion() != null) {
             contrato.setFechaCreacion(dto.getFechaCreacion());

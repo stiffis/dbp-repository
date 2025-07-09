@@ -11,7 +11,7 @@ public class CalificacionTrabajador {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long puntuacionTrabajador;
+    private Double puntuacionTrabajador;
 
     @OneToOne(mappedBy = "calificacionTrabajador")
     private Contrato contrato;

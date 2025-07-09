@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface TrabajadorService {
     TrabajadorDTO createPersona(Long idUsuario, CreateTrabajadorDTO persona);
-    TrabajadorDTO getPersonaById(Long id);
+    TrabajadorDTO getTrabajador(Long idUsuario);
     List<Trabajador> getAllPersonas();
-    TrabajadorDTO updateTrabajador(Long idUsuario,Long id, UpdateTrabajadorDTO trabajador);
+    TrabajadorDTO updateTrabajador(Long idUsuario, UpdateTrabajadorDTO trabajador);
     void deleteTrabajador(Long userId,Long id);
     List<Contrato> getContratosByPersona(Long personaId);
 

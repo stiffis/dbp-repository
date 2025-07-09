@@ -18,6 +18,7 @@ public class ContratoDTO {
     private Long id;
     private Date fechaCreacion;
     private Long personaContratadaId;
+    private Long ofertaEmpleoId;
     private Double promedioCalificaciones;
 }
 

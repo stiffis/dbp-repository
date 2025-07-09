@@ -6,12 +6,11 @@ import com.purrComplexity.TrabajoYa.OfertaEmpleo.OfertaEmpleo;
 import com.purrComplexity.TrabajoYa.Trabajador.Trabajador;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Entity
@@ -38,8 +37,9 @@ public class Contrato {
     @JoinColumn(name="calificacionEmpresa_id")
     private CalificacionEmpresa calificacionEmpresa;
 
-    @Valid
-    private Double calificacionPromedio;
+    @DecimalMin("0.0")
+    @DecimalMax("5.0")
+    private Double calificacionPromedio = 0.0;
 
 
 }

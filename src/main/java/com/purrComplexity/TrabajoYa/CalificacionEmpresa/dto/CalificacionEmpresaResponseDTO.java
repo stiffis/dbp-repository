@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class CalificacionEmpresaResponseDTO {
-    private Long puntuacionEmpresa;
+    private Double puntuacionContrato;
     private Long contratoId;
 }
